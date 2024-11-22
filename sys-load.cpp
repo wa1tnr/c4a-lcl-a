@@ -21,9 +21,6 @@ void sys_load() {
     outer(": v, vhere dup cell + (vhere) ! ! ;");
     outer(": vc, vhere dup 1+ (vhere) ! c! ;");
 
-    // NOTE: change this to control where the variables start 
-    // This reserves the desired CODE slots, the variables start after that
-    outerF("%d wc-sz * memory + (vhere) !", CODE_SLOTS);
     outer(": const  addword inline lit, (exit) , ;");
     outer(": var    vhere const allot ;");
     outer(": create vhere addword inline vhere lit, ;");

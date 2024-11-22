@@ -21,7 +21,7 @@ enum { DSPA=0, RSPA, LSPA, TSPA, ASPA, HA, LA, BA, SA };
 
 byte memory[MEM_SZ+1];
 wc_t *code = (wc_t*)&memory[0];
-cell lstk[LSTK_SZ+1], rstk[STK_SZ+1], dstk[STK_SZ+1];
+cell lstk[LSTK_SZ+1], rstk[RSTK_SZ+1], dstk[STK_SZ+1];
 cell tstk[TSTK_SZ+1], astk[TSTK_SZ+1];
 cell vhere;
 char wd[32], *toIn;
@@ -440,6 +440,7 @@ void baseSys() {
 	}
 	const char *addrFmt = addressFmt;
 	outerF(addrFmt, "mem-sz",  MEM_SZ);
+	outerF(addrFmt, "code-sz", CODE_SLOTS);
 	outerF(addrFmt, "de-sz",   sizeof(DE_T));
 	outerF(addrFmt, "dstk-sz", STK_SZ+1);
 	outerF(addrFmt, "tstk-sz", TSTK_SZ+1);
@@ -455,6 +456,7 @@ void baseSys() {
 	outerF(addrFmt, "tstk",    &tstk[0]);
 	outerF(addrFmt, "astk",    &astk[0]);
 	outerF(addrFmt, "memory",  &memory[0]);
+	outerF(addrFmt, "vars",    &memory[CODE_SLOTS*WC_SZ]);
 	outerF(addrFmt, ">in",     &toIn);
 	outerF(addrFmt, "wd",      &wd[0]);
 	outerF(addrFmt, "(vhere)", &vhere);
@@ -482,7 +484,7 @@ void c4Init() {
 	last = MEM_SZ;
 	base = 10;
 	state = INTERP;
-	vhere = (cell)&memory[0];
+	vhere = (cell)&memory[CODE_SLOTS*WC_SZ];
 	fileInit();
 	baseSys();
 }

@@ -5,7 +5,7 @@
 // TODO: support LittleFS for the PICO
 
 cell inputFp, outputFp;
-void fileInit() {}
+void fileInit() { zType("fileinit() - TODO"); }
 void filePush(cell fh) {}
 cell filePop() { return 0; }
 cell fileOpen(const char *name, const char *mode) { return 0; }

@@ -4,9 +4,6 @@
 
 #define mySerial Serial // Teensy and Pico
 
-// #include "file-teensy.ipp"
-// #include "file-pico.ipp"
-
 #ifdef mySerial
     void serialInit() { while (!mySerial) ; }
     void emit(char c) { mySerial.print(c); }
@@ -45,9 +42,9 @@ cell Fetch(const char *l) {
 char *in, tib[128];
 void setup() {
   serialInit();
-  // zType("Hello.");
-  fileInit();
   c4Init();
+  outer(" .\" %nc4 - version \" .version cr");
+  zType("Hello.");
   ok();
   in = (char*)0;
 }
