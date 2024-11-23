@@ -2,14 +2,14 @@
 #define __C4_H__
 
 #include <Arduino.h>
-#define MEM_SZ           384*1024
+#define MEM_SZ           400*1024
 #define STK_SZ            64 // Data stack
 #define RSTK_SZ           64 // Return stack
 #define LSTK_SZ           45 // 15 nested loops (3 entries per loop)
 #define TSTK_SZ           64 // 'A' and 'T' stacks
 #define FSTK_SZ           16 // Files stack
 #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
-#define CODE_SLOTS        32*1024 // 16*1024*4 = 64k
+#define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
 // #define FILE_NONE
 #define FILE_PICO
 // #define FILE_TEENSY
