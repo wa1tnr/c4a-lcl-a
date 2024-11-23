@@ -33,14 +33,14 @@ DE_T tmpWords[10];
 	X(SWAP,    "swap",      0, t=TOS; TOS=NOS; NOS=t; ) \
 	X(DROP,    "drop",      0, pop(); ) \
 	X(OVER,    "over",      0, t=NOS; push(t); ) \
-	X(FET,     "@",         0, TOS = fetchCell(TOS); ) \
-	X(FET1,    "c@",        0, TOS = *(byte *)TOS; ) \
-	X(LFET32,  "d@",        0, TOS = fetch32(TOS); ) \
-	X(FETC,    "wc@",       0, TOS = code[(wc_t)TOS]; ) \
-	X(STO,     "!",         0, t=pop(); n=pop(); storeCell(t, n); ) \
-	X(STO1,    "c!",        0, t=pop(); n=pop(); *(byte*)t=(byte)n; ) \
-	X(STO32,   "d!",        0, t=pop(); n=pop(); store32(t, n); ) \
-	X(STOC,    "wc!",       0, t=pop(); n=pop(); code[(wc_t)t] = (wc_t)n; ) \
+	X(FET8,    "c@",        0, TOS = *(byte *)TOS; ) \
+	X(FET16,   "w@",        0, TOS = fetch16(TOS); ) \
+	X(FET32,   "@",         0, TOS = fetch32(TOS); ) \
+	X(FETWC,   "wc@",       0, TOS = code[(wc_t)TOS]; ) \
+	X(STO8,    "c!",        0, t=pop(); n=pop(); *(byte*)t=(byte)n; ) \
+	X(STO16,   "w!",        0, t=pop(); n=pop(); store16(t, n); ) \
+	X(STO32,   "!",         0, t=pop(); n=pop(); store32(t, n); ) \
+	X(STOWC,   "wc!",       0, t=pop(); n=pop(); code[(wc_t)t] = (wc_t)n; ) \
 	X(ADD,     "+",         0, t=pop(); TOS += t; ) \
 	X(SUB,     "-",         0, t=pop(); TOS -= t; ) \
 	X(MUL,     "*",         0, t=pop(); TOS *= t; ) \
@@ -59,6 +59,7 @@ DE_T tmpWords[10];
 	X(FOR,     "for",       0, lsp+=3; L2=pc; L0=0; L1=pop(); ) \
 	X(INDEX,   "i",         0, push(L0); ) \
 	X(NEXT,    "next",      0, if (++L0<L1) { pc=(wc_t)L2; } else { lsp=(lsp<3) ? 0 : lsp-3; } ) \
+	X(UNLOOP,  "unloop",    0, lsp=(lsp<3) ? 0 : lsp-3; ) \
 	X(TOR,     ">r",        0, rpush(pop()); ) \
 	X(RSTO,    "r!",        0, rstk[rsp] = pop(); ) \
 	X(RAT,     "r@",        0, push(rstk[rsp]); ) \
@@ -151,12 +152,8 @@ void rpush(cell x) { if (rsp < RSTK_SZ) { rstk[++rsp] = x; } }
 cell rpop() { return (0<rsp) ? rstk[rsp--] : 0; }
 int lower(const char c) { return btwi(c, 'A', 'Z') ? c + 32 : c; }
 int strLen(const char *s) { int l = 0; while (s[l]) { l++; } return l; }
-void store32(cell a, cell v) { *(uint32_t*)(a) = (uint32_t)v; }
-cell fetch32(cell a) { return *(uint32_t*)(a); }
-void storeCell(cell a, cell v) { *(cell*)(a) = v; }
-cell fetchCell(cell a) { return *(cell*)(a); }
 void comma(cell x) { code[here++] = (wc_t)x; }
-void commaCell(cell n) { storeCell((cell)&code[here], n); here += (CELL_SZ / WC_SZ); }
+void commaCell(cell n) { store32((cell)&code[here], n); here += (CELL_SZ / WC_SZ); }
 int changeState(int x) { state = x; return x; }
 void ok() { if (state==0) { state=INTERP; } zType((state==INTERP) ? " ok\r\n" : "... "); }
 
@@ -248,7 +245,7 @@ void doSee() {
 		x = code[i];
 		switch (op) {
 			case  STOP: zType("stop"); i++;
-			BCASE LIT: x = fetchCell((cell)&code[i]);
+			BCASE LIT: x = fetch32((cell)&code[i]);
 				zTypeF("lit #%zd ($%zX)", (size_t)x, (size_t)x);
 				i += (CELL_SZ/WC_SZ);
 			BCASE JMP:    zTypeF("jmp $%04lX", (long)x);             i++;
@@ -293,7 +290,7 @@ void fType(const char *s) {
 
 void compileNum(cell num) {
 	if (btwi(num, 0, NUM_MASK)) { comma((wc_t)(num | NUM_BITS)); }
-	else { comma(LIT); commaCell(num); }
+	else { comma(LIT); comma(num); }
 }
 
 void quote() {
@@ -321,7 +318,7 @@ void inner(wc_t start) {
 	wc = code[pc++];
 	switch(wc) {
 		case  STOP:   return;
-		NCASE LIT:    push(fetchCell((cell)&code[pc])); pc += CELL_SZ/WC_SZ;
+		NCASE LIT:    push(fetch32((cell)&code[pc])); pc += CELL_SZ/WC_SZ;
 		NCASE JMP:    pc=code[pc];
 		NCASE JMPZ:   if (pop()==0) { pc=code[pc]; } else { ++pc; }
 		NCASE NJMPZ:  if (TOS==0) { pc=code[pc]; } else { ++pc; }

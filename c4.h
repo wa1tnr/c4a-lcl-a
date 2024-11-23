@@ -60,6 +60,10 @@ extern void ok();
 
 // c4.cpp needs these to be defined
 extern cell inputFp, outputFp;
+extern cell fetch16(cell loc);
+extern cell fetch32(cell loc);
+extern void store16(cell loc, cell val);
+extern void store32(cell loc, cell val);
 extern void zType(const char *str);
 extern void emit(const char ch);
 extern void ttyMode(int isRaw);

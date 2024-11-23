@@ -149,11 +149,11 @@ The primitives:
 | over      | (N X--N X N) | Push NOS |
 | @         | (A--N)       | N: the CELL at absolute address A |
 | c@        | (A--C)       | C: the CHAR at absolute address A |
-| d@        | (A--D)       | D: the DWORD at absolute address A |
+| w@        | (A--W)       | W: the WORD at absolute address A |
 | wc@       | (N--WC)      | WC: the WORD-CODE in CODE slot N |
 | !         | (N A--)      | Store CELL N to absolute address A |
 | c!        | (C A--)      | Store CHAR C to absolute address A |
-| d!        | (D A--)      | Store DWORD D to absolute address A |
+| w!        | (W A--)      | Store WORD W to absolute address A |
 | wc!       | (WC N--)     | Store WORD-CODE WC to CODE slot N |
 | +         | (X Y--N)     | N: X + Y |
 | -         | (X Y--N)     | N: X - Y |
@@ -173,6 +173,7 @@ The primitives:
 | for       | (N--)        | Begin FOR loop with bounds 0 and N-1. |
 | i         | (--I)        | N: Current FOR loop index. |
 | next      | (--)         | Increment I. If I >= N, exit, else start loop again. |
+| unloop    | (--)         | Unwind the loop stack. **NOTE:** does NOT exit the loop. |
 | >r        | (N--)        | Push N onto the return stack |
 | r!        | (N--)        | Set R-TOS to N |
 | r@        | (--N)        | N: copy of R-TOS |
