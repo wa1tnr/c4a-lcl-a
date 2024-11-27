@@ -1,6 +1,8 @@
 #include <cstdio>
 #include "c4.h"
 
+// #define FILE_PICO
+
 #ifdef FILE_PICO
 
 // NOTE: this uses LittleFS for the PICO
@@ -14,8 +16,9 @@ static char fn[32];
 File files[NFILES+1];
 char blockData[NUM_BLOCKS][BLOCK_SZ];
 
-void writeBlocks() { }
-char *blockAddr(cell Blk) { return 0; }
+void readBlocks() { } // TODO
+void writeBlocks() { } // TODO
+char *blockAddr(cell Blk) { return btwi(Blk,0,NUM_BLOCKS) ? &blockData[Blk][0] : 0; }
 
 void fileInit() {
     FSInfo fsinfo;
@@ -27,6 +30,7 @@ void fileInit() {
 	zTypeF("\nBytes total: %llu, used: %llu", fsinfo.totalBytes, fsinfo.usedBytes);
 	inputFp = fileSp = 0;
 	for (int i=0; i<=NFILES; i++) { files[i] = File(); }
+	readBlocks();
 }
 
 static char *blockFn(int blk) { sprintf(fn, "block-%03d.fth", blk); return fn; }
