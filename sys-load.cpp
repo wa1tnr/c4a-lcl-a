@@ -93,7 +93,7 @@ void sys_load() {
     outer(": ]] (exit) , 0 state wc! t@ (here) wc! t> >r t> (vhere) ! ; immediate");
 
     outer("mem-sz 1- ->memory const dict-end");
-    outer(": ->xt     d@ ;");
+    outer(": ->xt     @ ;");
     outer(": ->flags  wc-sz + c@ ;");
     outer(": ->len    wc-sz + 1+ c@ ;");
     outer(": ->name   wc-sz + 2+ ;");
@@ -112,7 +112,7 @@ void sys_load() {
     outer("cell var vh");
     outer(": marker here 20 wc! last 21 wc! vhere vh ! ;");
     outer(": forget 20 wc@ (here) wc! 21 wc@ (last) wc! vh @ (vhere) ! ;");
-    outer(": fgl last dup de-sz + (last) wc! ->memory d@ (here) wc! ;");
+    outer(": fgl last dup de-sz + (last) wc! ->memory @ (here) wc! ;");
 
 #ifndef FILE_NONE
     outer(": fopen-rt ( fn--fh )  z\" rt\" fopen ;");

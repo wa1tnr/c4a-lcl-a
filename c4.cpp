@@ -114,7 +114,8 @@ DE_T tmpWords[10];
 	X(FLGETS,  "fgets",     0, t=pop(); n=pop(); TOS = fileGets((char*)TOS, (int)n, t); ) \
 	X(INCL,    "include",   0, t=nextWord(); if (t) fileLoad(wd); ) \
 	X(LOAD,    "load",      0, t=pop(); blockLoad((int)t); ) \
-	X(NXTBLK,  "load-next", 0, t=pop(); blockLoadNext((int)t); )
+	X(NXTBLK,  "load-next", 0, t=pop(); blockLoadNext((int)t); ) \
+	X(BADDR,   "blk-addr",  0, t=pop(); push((cell)blockAddr(t)); )
 #else
     #define PRIMS_FILE
 #endif // FILE_NONE
@@ -122,7 +123,9 @@ DE_T tmpWords[10];
 #ifdef IS_PC
   #define PRIMS_SYSTEM \
 	X(SYSTEM,  "system", 0, t=pop(); ttyMode(0); system((char*)t); ) \
-	X(BYE,     "bye",    0, ttyMode(0); exit(0); )
+	X(EDIT,    "edit",   0, t=pop(); editBlock(t); ) \
+	X(FLUSH,   "flush",  0, writeBlocks(); ) \
+	X(BYE,     "bye",    0, ttyMode(0); writeBlocks(); exit(0); )
 #else // Must be a dev board ...
   #define PRIMS_SYSTEM \
 	X(POPENI,  "pin-input",  0, pinMode(pop(), INPUT); ) \
@@ -172,7 +175,7 @@ void strCpy(char *d, const char *s) {
 	*(d) = 0;
 }
 
-int nextWord() {
+int getWord() {
 	int len = 0, ch;
 	while (btwi(*toIn, 1, 32)) {
 		ch = *(toIn++);
@@ -181,6 +184,16 @@ int nextWord() {
 	while (btwi(*toIn, 33, 126)) { wd[len++] = *(toIn++); }
 	wd[len] = 0;
 	return len;
+}
+
+int nextWord() {
+	while (1) {
+		int len = getWord();
+		if (len) { return len; }
+		toIn = (char*)filePop();
+		if (toIn==0) { return 0; }
+	}
+	return 0;
 }
 
 int isTemp(const char *w) {

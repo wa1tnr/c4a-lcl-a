@@ -12,7 +12,10 @@
 cell inputFp, outputFp, fileSp, fileStk[FSTK_SZ+1];
 static char fn[32];
 File files[NFILES+1];
-char blockData[NFILES][1024];
+char blockData[NUM_BLOCKS][BLOCK_SZ];
+
+void writeBlocks() { }
+char *blockAddr(cell Blk) { return 0; }
 
 void fileInit() {
     FSInfo fsinfo;

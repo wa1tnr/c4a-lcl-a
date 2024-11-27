@@ -1,18 +1,13 @@
 #ifndef __C4_H__
 #define __C4_H__
 
-#include <Arduino.h>
-#define MEM_SZ           400*1024
-#define STK_SZ            64 // Data stack
-#define RSTK_SZ           64 // Return stack
-#define LSTK_SZ           45 // 15 nested loops (3 entries per loop)
-#define TSTK_SZ           64 // 'A' and 'T' stacks
-#define FSTK_SZ           16 // Files stack
-#define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
-#define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
-// #define FILE_NONE
-#define FILE_PICO
-// #define FILE_TEENSY
+#ifdef _MSC_VER
+  #define _CRT_SECURE_NO_WARNINGS
+  #define IS_WINDOWS 1
+#elif (defined __i386 || defined __x86_64 || defined IS_LINUX)
+  #define IS_LINUX   1
+  #define IS_PC      1
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,18 +15,46 @@
 #include <stdint.h>
 #include <time.h>
 
+#ifdef IS_PC
+  #define MEM_SZ        2*1024*1024
+  #define STK_SZ            64 // Data stack
+  #define RSTK_SZ           64 // Return stack
+  #define LSTK_SZ           45 // 15 nested loops (3 entries per loop)
+  #define TSTK_SZ           64 // 'A' and 'T' stacks
+  #define FSTK_SZ           16 // Files stack
+  #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
+  #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
+  #define NUM_BLOCKS      1024 // Each block is 1024 bytes
+  #define FILE_PC
+#else
+  #include <Arduino.h>
+  #define MEM_SZ           320*1024
+  #define STK_SZ            64 // Data stack
+  #define RSTK_SZ           64 // Return stack
+  #define LSTK_SZ           45 // 15 nested loops (3 entries per loop)
+  #define TSTK_SZ           64 // 'A' and 'T' stacks
+  #define FSTK_SZ           16 // Files stack
+  #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
+  #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
+  #define NUM_BLOCKS       100 // Each block is 1024 bytes
+  // #define FILE_NONE
+  #define FILE_PICO
+  // #define FILE_TEENSY
+#endif
+
 #define VERSION   20241112
 #define _SYS_LOAD_
 
 #define btwi(n,l,h)   ((l<=n) && (n<=h))
-#define _IMMED              1
-#define _INLINE             2
+#define _IMMED        1
+#define _INLINE       2
 
 #define CELL_T        int32_t
 #define CELL_SZ       4
 #define addressFmt    ": %s $%lx ; inline"
 #define WC_T          uint32_t
 #define WC_SZ         4
+#define BLOCK_SZ      1024
 #define NUM_BITS      0xE0000000
 #define NUM_MASK      0x1FFFFFFF
 
@@ -82,6 +105,9 @@ extern int  fileGets(char *buf, int sz, cell fh);
 extern void fileLoad(const char *name);
 extern void blockLoad(int blk);
 extern void blockLoadNext(int blk);
+extern char *blockAddr(cell blk);
+extern void editBlock(cell Blk);
+extern void writeBlocks();
 extern void sys_load();
 
 #endif //  __C4_H__
