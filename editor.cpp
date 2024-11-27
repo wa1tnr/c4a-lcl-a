@@ -6,7 +6,7 @@
 #define EDITOR
 
 #ifndef EDITOR
-void editBlock(cell Blk) { zType("-no bedit-"); }
+void editBlock(cell Blk) { zType("-no edit-"); }
 #else
 
 #define NUM_LINES     16
@@ -27,7 +27,7 @@ enum { Up=7240, Dn=7248, Rt=7245, Lt=7243, Home=7239, PgUp=7241, PgDn=7249,
     End=7247, Ins=7250, Del=7251 };
 
 static cell line, off, blkNum, edMode, isDirty, isShow;
-static char edBuf[BLOCK_SZ], yanked[NUM_COLS+1];
+static char edBuf[BLOCK_SZ], yanked[NUM_COLS+1], *curLine;
 
 static void GotoXY(int x, int y) { zTypeF("\x1B[%d;%dH", y, x); }
 static void CLS() { zType("\x1B[2J"); GotoXY(1, 1); }
@@ -113,7 +113,9 @@ static char *blockFn(int blk) {
     sprintf(fn, "block-%03d.fth", blk); return fn;
 }
 
-static void edRdBlk(int force) {
+static void edRdBlk() {
+    if (blkNum < 0) { blkNum=0; }
+    if (blkNum >= NUM_BLOCKS) { blkNum=NUM_BLOCKS-1; }
     char *f = blockAddr(blkNum);
     for (int i = 0; i < BLOCK_SZ; i++) { edBuf[i] = f[i]; }
     for (int i = 0; i < BLOCK_SZ; i++) { if (edBuf[i]==0) { edBuf[i] = 32; } }
@@ -242,10 +244,10 @@ static int edReadLine(char *buf, int sz) {
     CursorOn();
     while (len<(sz-1)) {
         char c = key();
+        if (c == 13) { break; }
         if (c ==  3) { len=0; break; }
         if (c == 27) { len=0; break; }
-        if (c == 13) { break; }
-        if ((c==127) || ((c==8) && (len))) { --len; zType("\x08 \x08"); }
+        if (((c==127) || (c==8)) && (0<len)) { --len; zType("\x08 \x08"); }
         if (btwi(c,32,126)) { buf[len++]=c; emit(c); }
     }
     CursorOff();
@@ -258,7 +260,7 @@ static void edCommand() {
     toCmd(); emit(':'); ClearEOL();
     edReadLine(buf, sizeof(buf));
     toCmd(); ClearEOL();
-    if (strEq(buf,"rl")) { edRdBlk(1); }
+    if (strEq(buf,"rl")) { edRdBlk(); }
     else if (buf[0]=='!') { outer(&buf[1]); }
     else if (strEq(buf,"w")) { edSvBlk(0); }
     else if (strEq(buf,"w!")) { edSvBlk(1); }
@@ -270,8 +272,8 @@ static void edCommand() {
     }
 }
 
-static void PageUp() { edSvBlk(0); blkNum = MAX(0, blkNum-1); edRdBlk(0); line=off=0; }
-static void PageDn() { edSvBlk(0); blkNum = MIN(NUM_BLOCKS, blkNum+1); edRdBlk(0); line=off=0; }
+static void PageUp() { edSvBlk(0); blkNum--; edRdBlk(); line=off=0; }
+static void PageDn() { edSvBlk(0); blkNum++; edRdBlk(); line=off=0; }
 
 static void doCTL(int c) {
     if (((c == 8) || (c == 127)) && (0 < off)) {      // <backspace>
@@ -323,8 +325,8 @@ static int processEditorChar(int c) {
         BCASE '2': replaceChar(2,1,0); // DEFINE
         BCASE '3': replaceChar(3,1,0); // INTERP
         BCASE '4': replaceChar(4,1,0); // COMMENT
-        BCASE '+': edSvBlk(0); ++blkNum; edRdBlk(0); line=off=0;
-        BCASE '-': edSvBlk(0); blkNum = MAX(0, blkNum-1); edRdBlk(0); line=off=0;
+        BCASE '+': edSvBlk(0); PageDn();
+        BCASE '-': edSvBlk(0); PageUp();
         BCASE ':': edCommand();
         BCASE 'a': mv(0, 1); insertMode();
         BCASE 'A': gotoEOL(); insertMode();
@@ -388,17 +390,18 @@ static void showEditor() {
 }
 
 void editBlock(cell Blk) {
-    blkNum = MAX(Blk, 0);
-    blkNum = MIN(blkNum, NUM_BLOCKS);
+    blkNum = Blk;
     line = off = 0;
     CLS();
-    edRdBlk(0);
+    edRdBlk();
     isShow = 1;
     normalMode();
     while (edMode != QUIT) {
         showEditor();
         showFooter();
         showCursor();
+        curLine = &EDCH(line,0);
+        edBuf[BLOCK_SZ-1]=0;
         processEditorChar(edKey());
     }
     toCmd();

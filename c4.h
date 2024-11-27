@@ -36,7 +36,7 @@
   #define FSTK_SZ           16 // Files stack
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
   #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
-  #define NUM_BLOCKS       100 // Each block is 1024 bytes
+  #define NUM_BLOCKS       128 // Each block is 1024 bytes
   // #define FILE_NONE
   #define FILE_PICO
   // #define FILE_TEENSY
@@ -93,15 +93,14 @@ extern void ttyMode(int isRaw);
 extern int  key();
 extern int  qKey();
 extern cell timer();
+extern void inPush(char *in);
+extern char *inPop();
 extern void fileInit();
-extern void filePush(cell fh);
-extern cell filePop();
 extern cell fileOpen(const char *name, const char *mode);
 extern void fileClose(cell fh);
 extern void fileDelete(const char *name);
 extern cell fileRead(char *buf, int sz, cell fh);
 extern cell fileWrite(char *buf, int sz, cell fh);
-extern int  fileGets(char *buf, int sz, cell fh);
 extern void fileLoad(const char *name);
 extern void blockLoad(int blk);
 extern void blockLoadNext(int blk);

@@ -60,10 +60,12 @@ cell fetch32(cell loc) {return *(int32_t*)loc; }
 
 // REP - Read/Execute/Print (no Loop)
 void REP() {
+	FILE *inFp = (FILE*)inputFp;
+	if (inFp == 0) { inFp = stdin; }
     char tib[128];
     ttyMode(0);
     ok();
-	if (fgets(tib, sizeof(tib), stdin) == tib) { outer(tib); }
+	if (fgets(tib, sizeof(tib), inFp) == tib) { outer(tib); }
     else { exit(0); }
 }
 

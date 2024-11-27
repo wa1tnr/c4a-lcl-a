@@ -3,17 +3,17 @@ CFLAGS = -O3 -m$(ARCH)
 srcfiles := $(shell find . -name "*.cpp")
 incfiles := $(shell find . -name "*.h")
 
-c4: $(srcfiles) $(incfiles)
+c4a: $(srcfiles) $(incfiles)
 	$(CC) $(CFLAGS) $(srcfiles) -DIS_LINUX=1 -o $@
 
-run: c4
-	./c4
+run: c4a
+	./c4a
 
 clean:
-	rm -f c4
+	rm -f c4a
 
-test: c4
-	./c4 block-200.fth
+test: c4a
+	./c4a block-200.fth
 
-bin: c4
-	cp -u -p c4 ~/bin/
+bin: c4a
+	cp -u -p c4a ~/bin/

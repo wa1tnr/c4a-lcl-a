@@ -7,7 +7,7 @@
 cell inputFp, outputFp;
 void fileInit() {}
 void filePush(cell fh) {}
-cell filePop() { return 0; }
+cell inPop() { return 0; }
 cell fileOpen(const char *name, const char *mode) { return 0; }
 void fileClose(cell fh) {}
 void fileDelete(const char *name) {}

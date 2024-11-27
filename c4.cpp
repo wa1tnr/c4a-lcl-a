@@ -26,6 +26,8 @@ cell tstk[TSTK_SZ+1], astk[TSTK_SZ+1];
 cell vhere;
 char wd[32], *toIn;
 DE_T tmpWords[10];
+char *inStk[FSTK_SZ+1];
+int inSp;
 
 #define PRIMS_BASE \
 	X(EXIT,    "exit",      0, if (0<rsp) { pc = (wc_t)rpop(); } else { return; } ) \
@@ -105,14 +107,12 @@ DE_T tmpWords[10];
 
 #ifndef FILE_NONE
 #define PRIMS_FILE \
-	X(LOADED,  "loaded?",   0, t=pop(); pop(); if (t) { fileClose(inputFp); inputFp=filePop(); } ) \
 	X(FLOPEN,  "fopen",     0, t=pop(); n=pop(); push(fileOpen((char*)n, (char*)t)); ) \
 	X(FLCLOSE, "fclose",    0, t=pop(); fileClose(t); ) \
 	X(FLDEL,   "fdelete",   0, t=pop(); fileDelete((char*)t); ) \
 	X(FLREAD,  "fread",     0, t=pop(); n=pop(); TOS = fileRead((char*)TOS, (int)n, t); ) \
 	X(FLWRITE, "fwrite",    0, t=pop(); n=pop(); TOS = fileWrite((char*)TOS, (int)n, t); ) \
-	X(FLGETS,  "fgets",     0, t=pop(); n=pop(); TOS = fileGets((char*)TOS, (int)n, t); ) \
-	X(INCL,    "include",   0, t=nextWord(); if (t) fileLoad(wd); ) \
+	X(LOADED,  "loaded?",   0, t=pop(); pop(); if (t) { toIn = inPop(); } ) \
 	X(LOAD,    "load",      0, t=pop(); blockLoad((int)t); ) \
 	X(NXTBLK,  "load-next", 0, t=pop(); blockLoadNext((int)t); ) \
 	X(BADDR,   "blk-addr",  0, t=pop(); push((cell)blockAddr(t)); )
@@ -153,6 +153,8 @@ void push(cell x) { if (dsp < STK_SZ) { dstk[++dsp] = x; } }
 cell pop() { return (0<dsp) ? dstk[dsp--] : 0; }
 void rpush(cell x) { if (rsp < RSTK_SZ) { rstk[++rsp] = x; } }
 cell rpop() { return (0<rsp) ? rstk[rsp--] : 0; }
+void inPush(char *in) { if (inSp < FSTK_SZ) { inStk[++inSp] = in; } }
+char *inPop() { return (0 < inSp) ? inStk[inSp--] : 0; }
 int lower(const char c) { return btwi(c, 'A', 'Z') ? c + 32 : c; }
 int strLen(const char *s) { int l = 0; while (s[l]) { l++; } return l; }
 void comma(cell x) { code[here++] = (wc_t)x; }
@@ -190,7 +192,7 @@ int nextWord() {
 	while (1) {
 		int len = getWord();
 		if (len) { return len; }
-		toIn = (char*)filePop();
+		toIn = (char*)inPop();
 		if (toIn==0) { return 0; }
 	}
 	return 0;
@@ -384,21 +386,19 @@ void compileWord(DE_T *de) {
 
 int isStateChange(const char *wd) {
 	static int prevState = INTERP;
+	if (prevState == COMMENT) { prevState = INTERP; }
 	if (strEq(wd,")")) { return changeState(prevState); }
 	if (state==COMMENT) { return 0; }
 	if (strEq(wd,":")) { return changeState(DEFINE); }
 	if (strEq(wd,"[")) { return changeState(INTERP); }
 	if (strEq(wd,"]")) { return changeState(COMPILE); }
-	if (strEq(wd,"(")) {
-		if (state!=COMMENT) { prevState=state; }
-		return changeState(COMMENT);
-	}
+	if (strEq(wd,"(")) { prevState=state; return changeState(COMMENT); }
 	return 0;
 }
 
 void outer(const char *ln) {
 	// zTypeF("-outer:%s-\n",ln);
-	char *curIn = toIn;
+	inPush(toIn);
 	toIn = (char*)ln;
 	while (nextWord()) {
 		// zTypeF("-word:(%s,%d)-",wd,state);
@@ -417,11 +417,12 @@ void outer(const char *ln) {
 		}
 		zTypeF("-%s?-", wd);
 		if (inputFp) { zTypeF(" at\r\n\t%s", ln); }
+		if (inputFp) { fileClose(inputFp); inputFp = 0; }
+		while (toIn) { toIn = inPop(); }
 		state = INTERP;
-		while (inputFp) { fileClose(inputFp); inputFp = filePop(); }
-		break;
+		return;
 	}
-	toIn = curIn;
+	toIn = inPop();
 }
 
 void outerF(const char *fmt, ...) {
@@ -494,6 +495,7 @@ void c4Init() {
 	last = MEM_SZ;
 	base = 10;
 	state = INTERP;
+	inSp = 0;
 	vhere = (cell)&memory[CODE_SLOTS*WC_SZ];
 	fileInit();
 	baseSys();
