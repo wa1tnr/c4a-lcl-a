@@ -23,11 +23,10 @@ byte memory[MEM_SZ+1];
 wc_t *code = (wc_t*)&memory[0];
 cell lstk[LSTK_SZ+1], rstk[RSTK_SZ+1], dstk[STK_SZ+1];
 cell tstk[TSTK_SZ+1], astk[TSTK_SZ+1];
-cell vhere;
+cell vhere, inSp, block;
 char wd[32], *toIn;
 DE_T tmpWords[10];
 char *inStk[FSTK_SZ+1];
-int inSp;
 
 #define PRIMS_BASE \
 	X(EXIT,    "exit",      0, if (0<rsp) { pc = (wc_t)rpop(); } else { return; } ) \
@@ -125,7 +124,7 @@ int inSp;
 	X(SYSTEM,  "system", 0, t=pop(); ttyMode(0); system((char*)t); ) \
 	X(EDIT,    "edit",   0, t=pop(); editBlock(t); ) \
 	X(FLUSH,   "flush",  0, writeBlocks(); ) \
-	X(BYE,     "bye",    0, ttyMode(0); writeBlocks(); exit(0); )
+	X(BYE,     "bye",    0, ttyMode(0); exit(0); )
 #else // Must be a dev board ...
   #define PRIMS_SYSTEM \
 	X(POPENI,  "pin-input",  0, pinMode(pop(), INPUT); ) \
@@ -155,11 +154,11 @@ void rpush(cell x) { if (rsp < RSTK_SZ) { rstk[++rsp] = x; } }
 cell rpop() { return (0<rsp) ? rstk[rsp--] : 0; }
 void inPush(char *in) { if (inSp < FSTK_SZ) { inStk[++inSp] = in; } }
 char *inPop() { return (0 < inSp) ? inStk[inSp--] : 0; }
-int lower(const char c) { return btwi(c, 'A', 'Z') ? c + 32 : c; }
-int strLen(const char *s) { int l = 0; while (s[l]) { l++; } return l; }
+int  lower(const char c) { return btwi(c, 'A', 'Z') ? c + 32 : c; }
+int  strLen(const char *s) { int l = 0; while (s[l]) { l++; } return l; }
 void comma(cell x) { code[here++] = (wc_t)x; }
 void commaCell(cell n) { store32((cell)&code[here], n); here += (CELL_SZ / WC_SZ); }
-int changeState(int x) { state = x; return x; }
+int  changeState(int x) { state = x; return x; }
 void ok() { if (state==0) { state=INTERP; } zType((state==INTERP) ? " ok\r\n" : "... "); }
 
 int strEqI(const char *s, const char *d) {
@@ -189,11 +188,12 @@ int getWord() {
 }
 
 int nextWord() {
+	if (toIn == 0) { return 0; }
 	while (1) {
 		int len = getWord();
 		if (len) { return len; }
 		toIn = (char*)inPop();
-		if (toIn==0) { return 0; }
+		if (toIn == 0) { return 0; }
 	}
 	return 0;
 }
@@ -470,6 +470,7 @@ void baseSys() {
 	outerF(addrFmt, "vars",    &memory[CODE_SLOTS*WC_SZ]);
 	outerF(addrFmt, ">in",     &toIn);
 	outerF(addrFmt, "wd",      &wd[0]);
+	outerF(addrFmt, "block",   &block);
 	outerF(addrFmt, "(vhere)", &vhere);
 	outerF(addrFmt, "(output-fp)", &outputFp);
 
@@ -495,7 +496,7 @@ void c4Init() {
 	last = MEM_SZ;
 	base = 10;
 	state = INTERP;
-	inSp = 0;
+	inSp = block = 0;
 	vhere = (cell)&memory[CODE_SLOTS*WC_SZ];
 	fileInit();
 	baseSys();

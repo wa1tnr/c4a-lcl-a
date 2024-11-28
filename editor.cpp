@@ -3,8 +3,6 @@
 #include "c4.h"
 #include <string.h>
 
-#define EDITOR
-
 #ifndef EDITOR
 void editBlock(cell Blk) { zType("-no edit-"); }
 #else
@@ -24,9 +22,9 @@ void editBlock(cell Blk) { zType("-no edit-"); }
 
 enum { NORMAL=1, INSERT, REPLACE, QUIT };
 enum { Up=7240, Dn=7248, Rt=7245, Lt=7243, Home=7239, PgUp=7241, PgDn=7249,
-    End=7247, Ins=7250, Del=7251 };
+    End=7247, Ins=7250, Del=7251, CHome=7287 };
 
-static cell line, off, blkNum, edMode, isDirty, isShow;
+static cell line, off, edMode, isDirty, isShow;
 static char edBuf[BLOCK_SZ], yanked[NUM_COLS+1], *curLine;
 
 static void GotoXY(int x, int y) { zTypeF("\x1B[%d;%dH", y, x); }
@@ -114,9 +112,9 @@ static char *blockFn(int blk) {
 }
 
 static void edRdBlk() {
-    if (blkNum < 0) { blkNum=0; }
-    if (blkNum >= NUM_BLOCKS) { blkNum=NUM_BLOCKS-1; }
-    char *f = blockAddr(blkNum);
+    if (block < 0) { block=0; }
+    if (block >= NUM_BLOCKS) { block=NUM_BLOCKS-1; }
+    char *f = blockAddr(block);
     for (int i = 0; i < BLOCK_SZ; i++) { edBuf[i] = f[i]; }
     for (int i = 0; i < BLOCK_SZ; i++) { if (edBuf[i]==0) { edBuf[i] = 32; } }
     isDirty = 0;
@@ -124,7 +122,7 @@ static void edRdBlk() {
 }
 
 static void edSvBlk(int force) {
-    char *t = blockAddr(blkNum);
+    char *t = blockAddr(block);
     t[BLOCK_SZ-1] = 0;
     for (int i = 0; i < BLOCK_SZ; i++) { t[i] = edBuf[i]; }
     isDirty = 0;
@@ -272,8 +270,8 @@ static void edCommand() {
     }
 }
 
-static void PageUp() { edSvBlk(0); blkNum--; edRdBlk(); line=off=0; }
-static void PageDn() { edSvBlk(0); blkNum++; edRdBlk(); line=off=0; }
+static void PageUp() { edSvBlk(0); block--; edRdBlk(); line=off=0; }
+static void PageDn() { edSvBlk(0); block++; edRdBlk(); line=off=0; }
 
 static void doCTL(int c) {
     if (((c == 8) || (c == 127)) && (0 < off)) {      // <backspace>
@@ -305,9 +303,9 @@ static void doCTL(int c) {
         BCASE End:  gotoEOL();              // End
         BCASE PgUp: PageUp();               // PgUp
         BCASE PgDn: PageDn();               // PgDn
-        BCASE 7251: edDelX('.');            // Delete
-        BCASE 7250: toggleInsert();         // Insert
-        BCASE 7287: mv(-NUM_LINES, -NUM_COLS);  // <ctrl>-Home
+        BCASE Del: edDelX('.');            // Delete
+        BCASE Ins: toggleInsert();         // Insert
+        BCASE CHome: mv(-NUM_LINES, -NUM_COLS);  // <ctrl>-Home
     }
 }
 
@@ -364,7 +362,7 @@ static void showFooter() {
     const char *x[3] = { "-normal-","-insert-","-replace-" };
     char ch = EDCH(line,off);
     toFooter(); FG(255);
-    zTypeF("Block# %03d%s", blkNum, isDirty ? " *" : "");
+    zTypeF("Block# %03d%s", block, isDirty ? " *" : "");
     if (edMode != NORMAL) { FG(203); }
     zTypeF(" %s", x[edMode-1]);
     if (edMode != NORMAL) { FG(255); }
@@ -390,7 +388,7 @@ static void showEditor() {
 }
 
 void editBlock(cell Blk) {
-    blkNum = Blk;
+    block = Blk;
     line = off = 0;
     CLS();
     edRdBlk();

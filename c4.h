@@ -1,6 +1,10 @@
 #ifndef __C4_H__
 #define __C4_H__
 
+#define VERSION   20241127
+#define _SYS_LOAD_
+#define EDITOR
+
 #ifdef _MSC_VER
   #define _CRT_SECURE_NO_WARNINGS
   #define IS_WINDOWS 1
@@ -42,9 +46,6 @@
   // #define FILE_TEENSY
 #endif
 
-#define VERSION   20241112
-#define _SYS_LOAD_
-
 #define btwi(n,l,h)   ((l<=n) && (n<=h))
 #define _IMMED        1
 #define _INLINE       2
@@ -67,8 +68,11 @@ typedef struct { wc_t xt; byte fl, ln; char nm[NAME_LEN+1]; } DE_T;
 typedef struct { wc_t op; const char *name; byte fl; } PRIM_T;
 
 // These are defined by c4.cpp
+extern cell block;
 extern void push(cell x);
 extern cell pop();
+extern void inPush(char *in);
+extern char *inPop();
 extern void strCpy(char *d, const char *s);
 extern int  strEq(const char *d, const char *s);
 extern int  strEqI(const char *d, const char *s);
@@ -93,8 +97,6 @@ extern void ttyMode(int isRaw);
 extern int  key();
 extern int  qKey();
 extern cell timer();
-extern void inPush(char *in);
-extern char *inPop();
 extern void fileInit();
 extern cell fileOpen(const char *name, const char *mode);
 extern void fileClose(cell fh);

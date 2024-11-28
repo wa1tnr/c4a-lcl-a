@@ -24,7 +24,7 @@ void writeBlocks() {
 
 char *blockAddr(cell blk) { return (char*)&blocks[blk][0]; }
 void blockLoad(int blk) { inPush(toIn); toIn=blockAddr(blk); toIn[BLOCK_SZ-1]=0; }
-void blockLoadNext(int blk) { toIn=blockAddr(blk); }
+void blockLoadNext(int blk) { toIn=blockAddr(blk); toIn[BLOCK_SZ-1]=0; }
 
 FILE *makeIn(cell fh) { return fh ? (FILE*)fh: stdin; }
 FILE *makeOut(cell fh) { return fh ? (FILE*)fh: stdout; }
