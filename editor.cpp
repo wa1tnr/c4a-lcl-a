@@ -290,6 +290,29 @@ static void toText() {
     }
 }
 
+static void toBlock() {
+    char x[BLOCK_SZ+1];
+    sprintf(x,"block-%3d.fth",block);
+    cell fh = fileOpen(x, "rb");
+    if (fh) {
+        for (int i=0; i<BLOCK_SZ; i++ ) { edBuf[i]=32; }
+        int n = fileRead(x, BLOCK_SZ, fh);
+        int r=0, c=0;
+        fileClose(fh);
+        for (int i=0; i<n; i++ ) {
+            char ch = x[i];
+            if (ch==13) { continue; }
+            if (ch==9) { ch=32; }
+            if (ch==10) {
+                while (c < NUM_COLS) { EDCH(r,c)=32; c++; }
+                if (r == MAX_LINE) { break; }
+                r++; c=0;
+            } else { EDCH(r,c)=ch; c++; }
+        }
+        DIRTY;
+    }
+}
+
 static void doCTL(int c) {
     if (((c == 8) || (c == 127)) && (0 < off)) {      // <backspace>
         mv(0, -1); if (edMode == INSERT) { deleteChar(0); }
@@ -367,7 +390,8 @@ static int processEditorChar(int c) {
         BCASE 'P': mv(0,-NUM_COLS); insertLine(line); putLine(line);
         BCASE 'r': replace1();
         BCASE 'R': replaceMode();
-        BCASE 'T': toText();
+        BCASE 't': toText();
+        BCASE 'T': toBlock();
         BCASE 'x': deleteChar(0);
         BCASE 'X': deleteChar(1);
         BCASE 'Y': yankLine(line);
