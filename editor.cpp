@@ -106,11 +106,6 @@ static void gotoEOL() {
     while (off && (EDCH(line, off-1) < 33)) { --off; }
 }
 
-static char *blockFn(int blk) {
-    static char fn[32];
-    sprintf(fn, "block-%03d.fth", blk); return fn;
-}
-
 static void edRdBlk() {
     if (block < 0) { block=0; }
     if (block >= NUM_BLOCKS) { block=NUM_BLOCKS-1; }
@@ -273,6 +268,28 @@ static void edCommand() {
 static void PageUp() { edSvBlk(0); block--; edRdBlk(); line=off=0; }
 static void PageDn() { edSvBlk(0); block++; edRdBlk(); line=off=0; }
 
+static void toText() {
+    char x[NUM_COLS+1];
+    sprintf(x,"block-%3d.fth",block);
+    cell fh = fileOpen(x, "wb");
+    if (fh) {
+        outputFp = fh;
+        for (int r=0; r<NUM_LINES; r++ ) {
+            char *f = &EDCH(r,0);
+            for (int r=0; r<NUM_COLS; r++ ) { x[r] = f[r]; }
+            x[NUM_COLS] = 0;
+            for (int r=MAX_COL; 0 <= r; r-- ) {
+                if (x[r]==32) { x[r] = 0; }
+                else { break;}
+            }
+            zType(x);
+            emit(10);
+        }
+        outputFp = 0;
+        fileClose(fh);
+    }
+}
+
 static void doCTL(int c) {
     if (((c == 8) || (c == 127)) && (0 < off)) {      // <backspace>
         mv(0, -1); if (edMode == INSERT) { deleteChar(0); }
@@ -350,6 +367,7 @@ static int processEditorChar(int c) {
         BCASE 'P': mv(0,-NUM_COLS); insertLine(line); putLine(line);
         BCASE 'r': replace1();
         BCASE 'R': replaceMode();
+        BCASE 'T': toText();
         BCASE 'x': deleteChar(0);
         BCASE 'X': deleteChar(1);
         BCASE 'Y': yankLine(line);
