@@ -24,9 +24,8 @@ wc_t *code = (wc_t*)&memory[0];
 cell lstk[LSTK_SZ+1], rstk[RSTK_SZ+1], dstk[STK_SZ+1];
 cell tstk[TSTK_SZ+1], astk[TSTK_SZ+1];
 cell vhere, inSp, block;
-char wd[32], *toIn;
 DE_T tmpWords[10];
-char *inStk[FSTK_SZ+1];
+char wd[32], *toIn, *inStk[FSTK_SZ+1];
 
 #define PRIMS_BASE \
 	X(EXIT,    "exit",      0, if (0<rsp) { pc = (wc_t)rpop(); } else { return; } ) \
