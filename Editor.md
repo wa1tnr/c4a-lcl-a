@@ -51,12 +51,12 @@ The movement keys are similar to those in VI:
 | +    | Save the current block and goto the next block |
 | -    | Save the current block and goto the previous block |
 | #    | Redraw the screen |
-| a    | Append: move right 1 char and change to INSERT mode |
-| A    | Append: goto the end of the line and change to INSERT mode |
+| a    | Append: move right 1 char and change to INSERT mode (same as 'li') |
+| A    | Append: goto the end of the line and change to INSERT mode  (same as '$i') |
 | b    | Insert a BLANK/SPACE into the current line |
 | B    | Insert a BLANK/SPACE to the end of the block |
 | c    | Delete the current char and change to INSERT mode (same as 'xi') |
-| C    | Delete to the end of the line and change to INSERT mode (same as 'd$A') |
+| C    | Delete to the end of the line and change to INSERT mode (same as 'd$i') |
 | d.   | Delete the char under the cursor (same as 'x') |
 | d$   | Delete to the end of the line |
 | dd   | Copy the current line into the YANK buffer and delete the line |
@@ -65,7 +65,7 @@ The movement keys are similar to those in VI:
 | g    | Goto the top-left of the screen |
 | G    | Goto the bottom-left of the screen |
 | i    | Insert: change to INSERT mode |
-| I    | Insert: goto the beginning of the line and change to INSERT mode |
+| I    | Insert: goto the beginning of the line and change to INSERT mode (same as '_i') |
 | J    | Join the current and next lines together |
 | n    | Insert a 'new-line' (#10/$0A) into the block |
 | o    | Insert an empty line BELOW the current line and change to INSERT mode |
@@ -74,8 +74,8 @@ The movement keys are similar to those in VI:
 | P    | Paste the YANK buffer into a new line ABOVE the current line |
 | r    | Replace the char under the cursor with the next key pressed (if printable) |
 | R    | Change to REPLACE mode |
-| t    | Translate block to text |
-| t    | Translate text to block |
+| t    | Translate current block to text file |
+| t    | Translate text file to current block  |
 | x    | Delete the char under the cursor to the end of the line |
 | X    | Delete the char under the cursor to the end of the block |
 | Y    | Copy the current line into the YANK buffer |
