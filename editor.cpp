@@ -43,6 +43,11 @@ static void insertMode()  { edMode=INSERT;  }
 static void replaceMode() { edMode=REPLACE; }
 static void toggleInsert() { (edMode==INSERT) ? normalMode() : insertMode(); }
 static int winKey() { return (245 << 5) ^ key(); }
+static void Green() { FG(40); }
+static void Red() { FG(203); }
+static void Yellow() { FG(226); }
+static void White() { FG(255); }
+
 
 static int vtKey() {
     int y = key();
@@ -205,8 +210,10 @@ static void replaceChar(char c, int force, int mov) {
 }
 
 static void replace1() {
-    FG(117); zType("?\x08"); CursorOn();
+    toCmd(); Red(); zType("-char?-"); CursorOn();
     int ch = key(); CursorOff();
+    toCmd(); ClearEOL();
+    // FG(117); zType("?\x08"); CursorOn();
     replaceChar(ch, 0, 1);
     isShow = 1;
 }
@@ -270,7 +277,7 @@ static void PageDn() { edSvBlk(0); block++; edRdBlk(); line=off=0; }
 
 static void toText() {
     char x[NUM_COLS+1];
-    sprintf(x,"block-%3d.fth",block);
+    sprintf(x,"block-%03d.fth",block);
     cell fh = fileOpen(x, "wb");
     if (fh) {
         outputFp = fh;
@@ -292,11 +299,12 @@ static void toText() {
 
 static void toBlock() {
     char x[BLOCK_SZ+1];
-    sprintf(x,"block-%3d.fth",block);
+    sprintf(x,"block-%03d.fth",block);
     cell fh = fileOpen(x, "rb");
+    if (!fh) { printf("-can't-open [%s]!-", x); }
     if (fh) {
         for (int i=0; i<BLOCK_SZ; i++ ) { edBuf[i]=32; }
-        int n = fileRead(x, BLOCK_SZ, fh);
+        int n = fileRead(x, BLOCK_SZ, fh);  printf("%d chars"); key();
         int r=0, c=0;
         fileClose(fh);
         for (int i=0; i<n; i++ ) {

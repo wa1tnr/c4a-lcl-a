@@ -74,8 +74,8 @@ The movement keys are similar to those in VI:
 | P    | Paste the YANK buffer into a new line ABOVE the current line |
 | r    | Replace the char under the cursor with the next key pressed (if printable) |
 | R    | Change to REPLACE mode |
-| t    | Translate current block to text file |
-| t    | Translate text file to current block  |
+| t    | Transfer current block to text file 'block-NNN.fth' |
+| T    | Transfer text file 'block-NNN.fth' to current block  |
 | x    | Delete the char under the cursor to the end of the line |
 | X    | Delete the char under the cursor to the end of the block |
 | Y    | Copy the current line into the YANK buffer |
