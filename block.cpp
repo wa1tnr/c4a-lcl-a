@@ -70,7 +70,6 @@ void flushBlocks() {
         dumpCacheEntry("flush", p);
         if (p->flags & BLOCK_DIRTY) { writeBlock(p); }
     }
-    // 
     // clearBlockCache();
 }
 
