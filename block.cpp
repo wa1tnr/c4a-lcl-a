@@ -6,7 +6,7 @@
 #define BLOCK_DIRTY    0x01
 #define BLOCK_CLEAN    0xFE;
 
-typedef struct { ushort num; byte seq, flags; char data[BLOCK_SZ]; } CACHE_T;
+typedef struct { uint16_t num; byte seq, flags; char data[BLOCK_SZ]; } CACHE_T;
 CACHE_T blockCache[BLOCK_CACHE_SZ];
 extern char *toIn;
 

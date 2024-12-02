@@ -8,6 +8,7 @@
 #ifdef _MSC_VER
   #define _CRT_SECURE_NO_WARNINGS
   #define IS_WINDOWS 1
+  #define IS_PC      1
 #elif (defined __i386 || defined __x86_64 || defined IS_LINUX)
   #define IS_LINUX   1
   #define IS_PC      1

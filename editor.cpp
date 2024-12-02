@@ -42,7 +42,7 @@ static void normalMode()  { edMode=NORMAL;  }
 static void insertMode()  { edMode=INSERT;  }
 static void replaceMode() { edMode=REPLACE; }
 static void toggleInsert() { (edMode==INSERT) ? normalMode() : insertMode(); }
-static int winKey() { return (245 << 5) ^ key(); }
+static int winKey() { return (224 << 5) ^ key(); }
 static void Green() { FG(40); }
 static void Red() { FG(203); }
 static void Yellow() { FG(226); }
@@ -305,7 +305,7 @@ static void toBlock() {
     if (!fh) { printf("-can't-open [%s]!-", x); }
     if (fh) {
         for (int i=0; i<BLOCK_SZ; i++ ) { edBuf[i]=32; }
-        int n = fileRead(x, BLOCK_SZ, fh);  printf("%d chars"); key();
+        int n = fileRead(x, BLOCK_SZ, fh);  printf("%d chars", n); key();
         int r=0, c=0;
         fileClose(fh);
         for (int i=0; i<n; i++ ) {
