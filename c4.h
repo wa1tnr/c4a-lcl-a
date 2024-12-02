@@ -1,7 +1,7 @@
 #ifndef __C4_H__
 #define __C4_H__
 
-#define VERSION   20241127
+#define VERSION   20241201
 #define _SYS_LOAD_
 #define EDITOR
 
@@ -29,8 +29,8 @@
   #define FSTK_SZ           16 // Files stack
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
   #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
-  #define NUM_BLOCKS      1024 // Each block is 1024 bytes
-  #define FILE_PC
+  #define BLOCK_CACHE_SZ    32 // Each block is 1024 bytes
+#define FILE_PC
 #else
   #include <Arduino.h>
   #define MEM_SZ           320*1024
@@ -41,7 +41,7 @@
   #define FSTK_SZ           16 // Files stack
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
   #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
-  #define NUM_BLOCKS       128 // Each block is 1024 bytes
+  #define BLOCK_CACHE_SZ    16 // Each block is 1024 bytes
   // #define FILE_NONE
   #define FILE_PICO
   // #define FILE_TEENSY
@@ -108,7 +108,7 @@ extern cell fileWrite(char *buf, int sz, cell fh);
 extern cell fileSeek(cell fh, cell pos);
 extern void fileLoad(const char *name);
 extern void blockLoad(int blk);
-extern void blockDirty(int blk);
+extern void blockIsDirty(int blk);
 extern void blockLoadNext(int blk);
 extern void clearBlockCache();
 extern char *blockAddr(cell blk);

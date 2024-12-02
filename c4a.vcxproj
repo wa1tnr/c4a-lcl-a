@@ -145,10 +145,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="block-001.fth" />
-    <None Include="block-003.fth" />
-    <None Include="block-005.fth" />
-    <None Include="block-999.fth" />
     <None Include="blocks.fth" />
     <None Include="Editor.md" />
     <None Include="LICENSE" />

@@ -112,8 +112,7 @@ static void gotoEOL() {
 }
 
 static void edRdBlk() {
-    if (block < 1) { block=1; }
-    if (block >= NUM_BLOCKS) { block=NUM_BLOCKS-1; }
+    if (block < 1) { block=0; }
     char *f = blockAddr(block);
     for (int i = 0; i < BLOCK_SZ; i++) { edBuf[i] = f[i]; }
     for (int i = 0; i < BLOCK_SZ; i++) { if (edBuf[i]==0) { edBuf[i] = 32; } }
@@ -122,10 +121,12 @@ static void edRdBlk() {
 }
 
 static void edSvBlk(int force) {
-    char *t = blockAddr(block);
-    if (isDirty || force) { blockDirty(block); }
-    for (int i = 0; i < BLOCK_SZ; i++) { t[i] = edBuf[i]; }
-    t[BLOCK_SZ-1] = 0;
+    if (isDirty || force) {
+        char *t = blockAddr(block);
+        blockIsDirty(block);
+        for (int i = 0; i < BLOCK_SZ; i++) { t[i] = edBuf[i]; }
+        t[BLOCK_SZ-1] = 0;
+    }
     isDirty = 0;
 }
 
@@ -273,8 +274,8 @@ static void edCommand() {
     }
 }
 
-static void PageUp() { edSvBlk(0); block--; edRdBlk(); line=off=0; }
-static void PageDn() { edSvBlk(0); block++; edRdBlk(); line=off=0; }
+static void PageUp() { if (0 < block) { edSvBlk(0); block--; edRdBlk(); line = off = 0; } }
+static void PageDn() { edSvBlk(0); block++; edRdBlk(); line = off = 0; }
 
 static void toText() {
     char x[NUM_COLS+1];
@@ -285,10 +286,11 @@ static void toText() {
         for (int r=0; r<NUM_LINES; r++ ) {
             char *f = &EDCH(r,0);
             for (int r=0; r<NUM_COLS; r++ ) { x[r] = f[r]; }
-            x[NUM_COLS] = 0;
+            x[MAX_COL+1] = 0;
+            if (x[MAX_COL]==0) { x[MAX_COL] = 32; }
             for (int r=MAX_COL; 0 <= r; r-- ) {
                 if (x[r]==32) { x[r] = 0; }
-                else { break;}
+                else { break; }
             }
             zType(x);
             emit(10);
@@ -302,10 +304,9 @@ static void toBlock() {
     char x[BLOCK_SZ+1];
     sprintf(x,"block-%03d.fth",block);
     cell fh = fileOpen(x, "rb");
-    if (!fh) { printf("-can't-open [%s]!-", x); }
     if (fh) {
         for (int i=0; i<BLOCK_SZ; i++ ) { edBuf[i]=32; }
-        int n = fileRead(x, BLOCK_SZ, fh);  printf("%d chars", n); key();
+        int n = fileRead(x, BLOCK_SZ, fh); toCmd(); zTypeF("%d chars", n);
         int r=0, c=0;
         fileClose(fh);
         for (int i=0; i<n; i++ ) {
@@ -319,7 +320,7 @@ static void toBlock() {
             } else { EDCH(r,c)=ch; c++; }
         }
         DIRTY;
-    }
+    } else { toCmd(); zTypeF("-can't-open [%s]!-", x); }
 }
 
 static void doCTL(int c) {

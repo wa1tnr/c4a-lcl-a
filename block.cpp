@@ -2,7 +2,6 @@
 
 #ifndef FILE_NONE
 // Support for blocks
-#define BLOCK_CACHE_SZ    16
 #define BLOCK_DIRTY     0x01
 #define BLOCK_CLEAN     0xFE
 #define BLOCK_FREE      0xFFFF
@@ -17,7 +16,7 @@ static void dumpCacheEntry(const char *msg, CACHE_T *p) {
 }
 
 void dumpCache() {
-    for (int i = 0; i < BLOCK_SZ; i++) { dumpCacheEntry("dump", &blockCache[i]); }
+    for (int i = 0; i < BLOCK_CACHE_SZ; i++) { dumpCacheEntry("dump", &blockCache[i]); }
 }
 
 void clearCacheEntry(CACHE_T* p) {
@@ -67,17 +66,16 @@ void writeBlock(CACHE_T *p) {
 void flushBlocks() {
     for (int i = 0; i < BLOCK_CACHE_SZ; i++) {
         CACHE_T* p = &blockCache[i];
-        dumpCacheEntry("flush", p);
+        // dumpCacheEntry("flush", p);
         if (p->flags & BLOCK_DIRTY) { writeBlock(p); }
+        p->seq = 0;
     }
-    // clearBlockCache();
 }
 
 static CACHE_T *findBlock(int blk) {
     // zTypeF("find: %d", blk);
     CACHE_T *p=NULL;
     uint16_t min=0xFFFF;
-    if (blk == 0) { return NULL; }
     for (int i=0; i<BLOCK_CACHE_SZ; i++) {
         CACHE_T *q = &blockCache[i];
         if (q->num == blk) { q->seq = ++seq; return q; } // Found
@@ -94,9 +92,9 @@ static CACHE_T *findBlock(int blk) {
     return p;
 }
 
-char *blockAddr(cell blk) { return blk ? &findBlock(blk)->data[0] : NULL; }
-void blockLoadNext(int blk) { if (blk) { toIn=blockAddr(blk); toIn[BLOCK_SZ-1]=0; } }
-void blockLoad(int blk) { if (blk) { inPush(toIn); blockLoadNext(blk); } }
-void blockDirty(int blk) { CACHE_T *p=findBlock(blk); if (p) { p->flags |= BLOCK_DIRTY; } }
+char *blockAddr(cell blk) { return &findBlock(blk)->data[0]; }
+void blockLoadNext(int blk) { toIn=blockAddr(blk); toIn[BLOCK_SZ-1]=0; }
+void blockLoad(int blk) { inPush(toIn); blockLoadNext(blk); }
+void blockIsDirty(int blk) { CACHE_T *p=findBlock(blk); if (p) { p->flags |= BLOCK_DIRTY; } }
 
 #endif // FILE_NONE

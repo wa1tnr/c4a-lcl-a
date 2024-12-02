@@ -13,4 +13,4 @@
 
 .color(c--c)dup dup fg ." color-%d%n" ;
 colors(f t--)over - 1+ for .color 1+ next drop white ;
-                                                               
+
