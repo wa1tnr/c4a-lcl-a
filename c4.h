@@ -103,12 +103,14 @@ extern void fileClose(cell fh);
 extern void fileDelete(const char *name);
 extern cell fileRead(char *buf, int sz, cell fh);
 extern cell fileWrite(char *buf, int sz, cell fh);
+extern cell fileSeek(cell fh, cell pos);
 extern void fileLoad(const char *name);
 extern void blockLoad(int blk);
+extern void blockDirty(int blk);
 extern void blockLoadNext(int blk);
 extern char *blockAddr(cell blk);
 extern void editBlock(cell Blk);
-extern void writeBlocks();
+extern void flushBlocks();
 extern void sys_load();
 
 #endif //  __C4_H__

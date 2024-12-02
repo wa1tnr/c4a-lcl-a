@@ -110,6 +110,7 @@ char wd[32], *toIn, *inStk[FSTK_SZ+1];
 	X(FLDEL,   "fdelete",   0, t=pop(); fileDelete((char*)t); ) \
 	X(FLREAD,  "fread",     0, t=pop(); n=pop(); TOS = fileRead((char*)TOS, (int)n, t); ) \
 	X(FLWRITE, "fwrite",    0, t=pop(); n=pop(); TOS = fileWrite((char*)TOS, (int)n, t); ) \
+	X(FSEEK,   "fseek",     0, t=pop(); TOS = fileSeek(TOS, t); ) \
 	X(LOADED,  "loaded?",   0, t=pop(); pop(); if (t) { toIn = inPop(); } ) \
 	X(LOAD,    "load",      0, t=pop(); blockLoad((int)t); ) \
 	X(NXTBLK,  "load-next", 0, t=pop(); blockLoadNext((int)t); ) \
@@ -122,7 +123,7 @@ char wd[32], *toIn, *inStk[FSTK_SZ+1];
   #define PRIMS_SYSTEM \
 	X(SYSTEM,  "system", 0, t=pop(); ttyMode(0); system((char*)t); ) \
 	X(EDIT,    "edit",   0, t=pop(); editBlock(t); ) \
-	X(FLUSH,   "flush",  0, writeBlocks(); ) \
+	X(FLUSH,   "flush",  0, flushBlocks(); ) \
 	X(BYE,     "bye",    0, ttyMode(0); exit(0); )
 #else // Must be a dev board ...
   #define PRIMS_SYSTEM \

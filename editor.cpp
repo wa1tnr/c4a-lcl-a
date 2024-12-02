@@ -112,7 +112,7 @@ static void gotoEOL() {
 }
 
 static void edRdBlk() {
-    if (block < 0) { block=0; }
+    if (block < 1) { block=1; }
     if (block >= NUM_BLOCKS) { block=NUM_BLOCKS-1; }
     char *f = blockAddr(block);
     for (int i = 0; i < BLOCK_SZ; i++) { edBuf[i] = f[i]; }
@@ -123,8 +123,9 @@ static void edRdBlk() {
 
 static void edSvBlk(int force) {
     char *t = blockAddr(block);
-    t[BLOCK_SZ-1] = 0;
+    if (isDirty || force) { blockDirty(block); }
     for (int i = 0; i < BLOCK_SZ; i++) { t[i] = edBuf[i]; }
+    t[BLOCK_SZ-1] = 0;
     isDirty = 0;
 }
 

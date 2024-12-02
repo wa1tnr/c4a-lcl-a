@@ -79,7 +79,7 @@ void loadArgument(const char *arg) {
 int main(int argc, char *argv[]) {
 	c4Init();
     if (argc > 1) { loadArgument(argv[1]); }
-    else { outer("999 load"); }
+    else { outer("1 load"); }
     while (1) { REP(); };
 	return 0;
 }
