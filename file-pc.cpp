@@ -15,6 +15,7 @@ void fileDelete(const char *name) { remove(name); }
 cell fileRead(char *buf, int sz, cell fh) { return fread(buf, 1, sz, makeIn(fh)); }
 cell fileWrite(char *buf, int sz, cell fh) { return fwrite(buf, 1, sz, makeOut(fh)); }
 cell fileSeek(cell fh, cell pos) { return fseek((FILE*)fh,pos,SEEK_SET); }
-void fileInit() {}
+void fileInit() { clearBlockCache(); }
+void fileExit() { flushBlocks(); }
 
 #endif // FILE_PC
