@@ -114,9 +114,10 @@ char wd[32], *toIn, *inStk[FSTK_SZ+1];
 	X(LOADED,  "loaded?",   0, t=pop(); pop(); if (t) { toIn = inPop(); } ) \
 	X(LOAD,    "load",      0, t=pop(); blockLoad((int)t); ) \
 	X(NXTBLK,  "load-next", 0, t=pop(); blockLoadNext((int)t); ) \
-	X(BADDR,   "blk-addr",  0, t=pop(); push((cell)blockAddr(t)); ) \
 	X(BCACHE,  "blocks",    0, dumpCache(); ) \
-	X(FLUSH,   "flush",     0, flushBlocks(); )
+	X(BADDR, "block-addr",  0, t=pop(); push((cell)blockAddr(t)); ) \
+	X(FLUSH,   "flush",     0, flushBlocks(pop()); ) \
+	X(FLBLK, "flush-block", 0, t=pop(); n=pop(); flushBlock(n, 0, t); )
 #else
     #define PRIMS_FILE
 #endif // FILE_NONE

@@ -6,7 +6,6 @@
 #define BLOCK_CLEAN     0xFE
 #define BLOCK_FREE      0xFFFF
 
-typedef struct { uint16_t num, seq, flags; char data[BLOCK_SZ]; } CACHE_T;
 CACHE_T blockCache[BLOCK_CACHE_SZ];
 static uint16_t seq;
 extern char *toIn;
@@ -16,19 +15,17 @@ static void dumpCacheEntry(const char *msg, CACHE_T *p) {
 }
 
 void dumpCache() {
-    for (int i = 0; i < BLOCK_CACHE_SZ; i++) { dumpCacheEntry("dump", &blockCache[i]); }
+    for (int i=0; i<BLOCK_CACHE_SZ; i++) { dumpCacheEntry("dump", &blockCache[i]); }
 }
 
-void clearCacheEntry(CACHE_T* p) {
-    for (int i = 0; i < BLOCK_SZ; i++) { p->data[i] = 0; }
+static void clearCacheEntry(CACHE_T* p) {
+    for (int i=0; i<BLOCK_SZ; i++) { p->data[i] = 0; }
     p->seq = p->flags = 0;
     p->num = BLOCK_FREE;
 }
 
-void clearBlockCache() {
-    for (int i = 0; i < BLOCK_CACHE_SZ; i++) {
-        clearCacheEntry(&blockCache[i]);
-    }
+void blockInit() {
+    for (int i=0; i<BLOCK_CACHE_SZ; i++) { clearCacheEntry(&blockCache[i]); }
     seq = 0;
 }
 
@@ -48,7 +45,7 @@ static void readBlock(CACHE_T *p) {
     p->flags = 0;
 }
 
-void writeBlock(CACHE_T *p) {
+static void writeBlock(CACHE_T *p) {
     dumpCacheEntry("write", p);
     cell fh=fileOpen("blocks.fth","r+b");
     if (!fh) { fh=fileOpen("blocks.fth", "wb"); }
@@ -63,19 +60,9 @@ void writeBlock(CACHE_T *p) {
     p->flags &= BLOCK_CLEAN;
 }
 
-void flushBlocks() {
-    for (int i = 0; i < BLOCK_CACHE_SZ; i++) {
-        CACHE_T *p = &blockCache[i];
-        // dumpCacheEntry("flush", p);
-        if (p->flags & BLOCK_DIRTY) { writeBlock(p); }
-        p->seq = 0;
-    }
-    seq = 0;
-}
-
 static CACHE_T *findBlock(int blk) {
     // zTypeF("find: %d", blk);
-    for (int i = 0; i < BLOCK_CACHE_SZ; i++) {
+    for (int i=0; i<BLOCK_CACHE_SZ; i++) {
         CACHE_T* q = &blockCache[i];
         if (q->num == blk) { q->seq = ++seq; return q; } // Found
     }
@@ -83,17 +70,30 @@ static CACHE_T *findBlock(int blk) {
     CACHE_T *p=NULL;
     for (int i = 0; i < BLOCK_CACHE_SZ; i++) {
         CACHE_T* q = &blockCache[i];
-        if (q->num == BLOCK_FREE) { p = q; break; } // Free
-        if (q->seq < min) { p = q; min = q->seq; } // Oldest
+        if (q->num == BLOCK_FREE) { p=q; break; } // Free
+        if (q->seq < min) { p=q; min=q->seq; } // Oldest
     }
 
-    if (p->flags & BLOCK_DIRTY) { writeBlock(p); }
+    flushBlock(0, p, 0);
     p->num = blk;
     p->seq = ++seq;
     p->flags = 0;
     readBlock(p);
     // dumpCacheEntry("found", p);
     return p;
+}
+
+void flushBlock(cell blk, CACHE_T *p, cell clear) {
+    if (!p) { p=findBlock((uint16_t)blk); }
+    if (p->flags & BLOCK_DIRTY) { writeBlock(p); }
+    if (clear) { clearCacheEntry(p); }
+}
+
+void flushBlocks(cell clear) {
+    for (int i=0; i<BLOCK_CACHE_SZ; i++) {
+        flushBlock(0, &blockCache[i], clear);
+    }
+    if (clear) { seq = 0; }
 }
 
 char *blockAddr(cell blk) { return &findBlock(blk)->data[0]; }

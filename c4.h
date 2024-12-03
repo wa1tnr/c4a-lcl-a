@@ -29,7 +29,7 @@
   #define FSTK_SZ           16 // Files stack
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
   #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
-  #define BLOCK_CACHE_SZ    32 // Each block is 1024 bytes
+  #define BLOCK_CACHE_SZ    16 // Each block is 1024 bytes
 #define FILE_PC
 #else
   #include <Arduino.h>
@@ -67,6 +67,7 @@ typedef WC_T wc_t;
 typedef unsigned char byte;
 typedef struct { wc_t xt; byte fl, ln; char nm[NAME_LEN+1]; } DE_T;
 typedef struct { wc_t op; const char *name; byte fl; } PRIM_T;
+typedef struct { uint16_t num, seq, flags; char data[BLOCK_SZ]; } CACHE_T;
 
 // These are defined by c4.cpp
 extern cell block;
@@ -98,6 +99,9 @@ extern void ttyMode(int isRaw);
 extern int  key();
 extern int  qKey();
 extern cell timer();
+extern void sys_load();
+
+// Files
 extern void fileInit();
 extern void fileExit();
 extern cell fileOpen(const char *name, const char *mode);
@@ -107,14 +111,16 @@ extern cell fileRead(char *buf, int sz, cell fh);
 extern cell fileWrite(char *buf, int sz, cell fh);
 extern cell fileSeek(cell fh, cell pos);
 extern void fileLoad(const char *name);
-extern void blockLoad(int blk);
-extern void blockIsDirty(int blk);
-extern void blockLoadNext(int blk);
-extern void clearBlockCache();
-extern void dumpCache();
+
+// Blocks
+extern void blockInit();
 extern char *blockAddr(cell blk);
-extern void editBlock(cell Blk);
-extern void flushBlocks();
-extern void sys_load();
+extern void blockIsDirty(int blk);
+extern void blockLoad(int blk);
+extern void blockLoadNext(int blk);
+extern void dumpCache();
+extern void editBlock(cell blk);
+extern void flushBlock(cell blk, CACHE_T *p, cell clear);
+extern void flushBlocks(cell clear);
 
 #endif //  __C4_H__

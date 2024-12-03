@@ -4,7 +4,7 @@
 #include <string.h>
 
 #ifndef EDITOR
-void editBlock(cell Blk) { zType("-no edit-"); }
+void editBlock(cell blk) { zType("-no edit-"); }
 #else
 
 #define NUM_LINES     16
@@ -47,7 +47,6 @@ static void Green() { FG(40); }
 static void Red() { FG(203); }
 static void Yellow() { FG(226); }
 static void White() { FG(255); }
-
 
 static int vtKey() {
     int y = key();
@@ -439,8 +438,8 @@ static void showEditor() {
     isShow = 0;
 }
 
-void editBlock(cell Blk) {
-    block = Blk;
+void editBlock(cell blk) {
+    block = blk;
     line = off = 0;
     CLS();
     edRdBlk();
