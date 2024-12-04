@@ -81,6 +81,7 @@ extern int  strEqI(const char *d, const char *s);
 extern int  strLen(const char *s);
 extern int  lower(const char c);
 extern void zTypeF(const char *fmt, ...);
+extern int  changeState(int x);
 extern void inner(wc_t start);
 extern void outer(const char *src);
 extern void outerF(const char *fmt, ...);

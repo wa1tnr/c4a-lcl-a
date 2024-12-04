@@ -202,6 +202,15 @@ static void joinLines() {
     deleteLine(line+1);
 }
 
+static void execLine(int l) {
+    char *x = &EDCH(line,0);
+    char c = x[MAX_COL];
+    x[MAX_COL] = 0;
+    toCmd(); ttyMode(0);
+    changeState(INTERP); outer(x);
+    x[MAX_COL] = c;
+}
+
 static void replaceChar(char c, int force, int mov) {
     if (btwi(c,32,126) || (force)) {
         EDCH(line, off)=c;
@@ -262,7 +271,7 @@ static void edCommand() {
     edReadLine(buf, sizeof(buf));
     toCmd(); ClearEOL();
     if (strEq(buf,"rl")) { edRdBlk(); }
-    else if (buf[0]=='!') { outer(&buf[1]); }
+    else if (buf[0]=='!') { ttyMode(0); outer(&buf[1]); }
     else if (strEq(buf,"w")) { edSvBlk(0); }
     else if (strEq(buf,"w!")) { edSvBlk(1); }
     else if (strEq(buf,"wq")) { edSvBlk(0); edMode=QUIT; }
@@ -336,6 +345,7 @@ static void doCTL(int c) {
         BCASE  2:   doInsertReplace(c);     // DEFINE
         BCASE  3:   doInsertReplace(c);     // INTERP
         BCASE  4:   doInsertReplace(c);     // COMMENT
+        BCASE  5:   execLine(line);         // Execute current line
         BCASE  9:   mv(0, 8);               // <tab>
         BCASE 10:   mv(1, 0);               // <ctrl-j>
         BCASE 11:   mv(-1, 0);              // <ctrl-k>

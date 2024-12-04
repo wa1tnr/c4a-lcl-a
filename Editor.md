@@ -19,6 +19,7 @@ There are 4 modes in the editor:
 | [ctrl]+b  | Insert tag: DEFINE |
 | [ctrl]+c  | Insert tag: INTERP |
 | [ctrl]+d  | Insert tag: COMMENT |
+| [ctrl]+e  | Execute the current line |
 | [ctrl]+h  | Left 1 char |
 | [ctrl]+i  | Right 8 chars (also [tab]) |
 | [ctrl]+j  | Down 1 line |
