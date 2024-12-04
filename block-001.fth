@@ -6,7 +6,7 @@
 lsz" ls -l" system ;    lgz" lazygit" system ;
 
 ." c4 - " green .version white
-1 block !
+2 block !
 
 
 

@@ -1,9 +1,9 @@
-block #002
-ls
-lg
+- these are for executing from the editor -
+
+ ls
+ lg
  flush
  blocks
-
 
 
 
