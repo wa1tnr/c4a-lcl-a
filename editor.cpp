@@ -202,12 +202,12 @@ static void joinLines() {
     deleteLine(line+1);
 }
 
-static void execLine(int l) {
-    char *x = &EDCH(line,0);
+static void execLine(int ln) {
+    char *x = &EDCH(ln,0);
     char c = x[MAX_COL];
     x[MAX_COL] = 0;
-    toCmd(); ttyMode(0);
-    changeState(INTERP); outer(x);
+    changeState(INTERP); ttyMode(0);
+    toFooter(); emit('\n'); outer(x);
     x[MAX_COL] = c;
 }
 
@@ -220,10 +220,10 @@ static void replaceChar(char c, int force, int mov) {
 }
 
 static void replace1() {
+    FG(117); zType("?\x08");
     toCmd(); Red(); zType("-char?-"); CursorOn();
     int ch = key(); CursorOff();
     toCmd(); ClearEOL();
-    // FG(117); zType("?\x08"); CursorOn();
     replaceChar(ch, 0, 1);
     isShow = 1;
 }

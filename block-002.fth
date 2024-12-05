@@ -5,7 +5,7 @@
  0 flush
  blocks
  z" ccc dev" system
-
+ z" git pull" system
 
 
 
