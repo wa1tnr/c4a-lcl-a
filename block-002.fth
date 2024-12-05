@@ -2,7 +2,7 @@
 
  ls
  lg
- flush
+ 0 flush
  blocks
  z" ccc dev" system
 
