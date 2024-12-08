@@ -270,13 +270,13 @@ static void edCommand() {
     toCmd(); emit(':'); ClearEOL();
     edReadLine(buf, sizeof(buf));
     toCmd(); ClearEOL();
-    if (strEq(buf,"rl")) { edRdBlk(); }
+    if (strEqI(buf,"rl")) { edRdBlk(); }
     else if (buf[0]=='!') { ttyMode(0); outer(&buf[1]); }
-    else if (strEq(buf,"w")) { edSvBlk(0); }
-    else if (strEq(buf,"w!")) { edSvBlk(1); }
-    else if (strEq(buf,"wq")) { edSvBlk(0); edMode=QUIT; }
-    else if (strEq(buf,"q!")) { edMode=QUIT; }
-    else if (strEq(buf,"q")) {
+    else if (strEqI(buf,"w")) { edSvBlk(0); }
+    else if (strEqI(buf,"w!")) { edSvBlk(1); }
+    else if (strEqI(buf,"wq")) { edSvBlk(0); edMode=QUIT; }
+    else if (strEqI(buf,"q!")) { edMode=QUIT; }
+    else if (strEqI(buf,"q")) {
         if (isDirty) { zType("(use 'q!' to quit without saving)"); }
         else { edMode=QUIT; }
     }

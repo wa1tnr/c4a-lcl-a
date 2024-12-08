@@ -437,7 +437,8 @@ void baseSys() {
 		w->xt = prims[i].op;
 		w->fl = prims[i].fl;
 	}
-	const char *addrFmt = addressFmt;
+
+	const char *addrFmt = ": %s $%lx ; inline";
 	outerF(addrFmt, "mem-sz",  MEM_SZ);
 	outerF(addrFmt, "code-sz", CODE_SLOTS);
 	outerF(addrFmt, "de-sz",   sizeof(DE_T));

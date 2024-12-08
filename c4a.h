@@ -28,19 +28,19 @@
   #define TSTK_SZ           64 // 'A' and 'T' stacks
   #define FSTK_SZ           16 // Files stack
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
-  #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
+  #define CODE_SLOTS   32*1024 // 32*1024*4 = 128k bytes
   #define BLOCK_CACHE_SZ    32 // Each block is 1024 bytes
 #define FILE_PC
 #else
   #include <Arduino.h>
-  #define MEM_SZ           320*1024
+  #define MEM_SZ      320*1024
   #define STK_SZ            64 // Data stack
   #define RSTK_SZ           64 // Return stack
   #define LSTK_SZ           45 // 15 nested loops (3 entries per loop)
   #define TSTK_SZ           64 // 'A' and 'T' stacks
   #define FSTK_SZ           16 // Files stack
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
-  #define CODE_SLOTS        32*1024 // 32*1024*4 = 128k
+  #define CODE_SLOTS   32*1024 // 32*1024*4 = 128k
   #define BLOCK_CACHE_SZ    16 // Each block is 1024 bytes
   // #define FILE_NONE
   #define FILE_PICO
@@ -53,7 +53,6 @@
 
 #define CELL_T        int32_t
 #define CELL_SZ       4
-#define addressFmt    ": %s $%lx ; inline"
 #define WC_T          uint32_t
 #define WC_SZ         4
 #define BLOCK_SZ      1024
