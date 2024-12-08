@@ -1,6 +1,6 @@
 // editor.cpp - A simple block editor
 
-#include "c4.h"
+#include "c4a.h"
 #include <string.h>
 
 #ifndef EDITOR

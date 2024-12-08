@@ -1,4 +1,4 @@
-#include "c4.h"
+#include "c4a.h"
 
 #ifndef FILE_NONE
 // Support for blocks
@@ -11,10 +11,11 @@ static uint16_t seq;
 extern char *toIn;
 
 static void dumpCacheEntry(const char *msg, CACHE_T *p) {
-    zTypeF("\n%s: blk:%u, seq:%u, flgs:%u",msg, p->num, p->seq, p->flags);
+    zTypeF("%s: blk:%u, seq:%u, flgs:%u\n",msg, p->num, p->seq, p->flags);
 }
 
 void dumpCache() {
+    zType("\n");
     for (int i=0; i<BLOCK_CACHE_SZ; i++) { dumpCacheEntry("dump", &blockCache[i]); }
 }
 

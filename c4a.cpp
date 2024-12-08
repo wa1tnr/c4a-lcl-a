@@ -1,29 +1,15 @@
-#include "c4.h"
+#include "c4a.h"
 
 #define NCASE         goto next; case
 #define BCASE         break; case
-#define dsp           code[DSPA]
-#define rsp           code[RSPA]
-#define lsp           code[LSPA]
-#define tsp           code[TSPA]
-#define asp           code[ASPA]
-#define here          code[HA]
-#define last          code[LA]
-#define base          code[BA]
-#define state         code[SA]
-#define TOS           dstk[dsp]
-#define NOS           dstk[dsp-1]
 #define L0            lstk[lsp]
 #define L1            lstk[lsp-1]
 #define L2            lstk[lsp-2]
-
-enum { DSPA=0, RSPA, LSPA, TSPA, ASPA, HA, LA, BA, SA };
 
 byte memory[MEM_SZ+1];
 wc_t *code = (wc_t*)&memory[0];
 cell lstk[LSTK_SZ+1], rstk[RSTK_SZ+1], dstk[STK_SZ+1];
 cell tstk[TSTK_SZ+1], astk[TSTK_SZ+1];
-cell vhere, inSp, block;
 DE_T tmpWords[10];
 char wd[32], *toIn, *inStk[FSTK_SZ+1];
 
@@ -498,7 +484,7 @@ void c4Init() {
 	last = MEM_SZ;
 	base = 10;
 	state = INTERP;
-	inSp = block = 0;
+	dsp = rsp = inSp = block = 0;
 	vhere = (cell)&memory[CODE_SLOTS*WC_SZ];
 	fileInit();
 	baseSys();

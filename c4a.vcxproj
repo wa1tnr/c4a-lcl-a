@@ -162,7 +162,7 @@
     <ClCompile Include="sys-pc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="c4.h" />
+    <ClInclude Include="c4a.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

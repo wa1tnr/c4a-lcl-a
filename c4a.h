@@ -61,6 +61,7 @@
 #define NUM_MASK      0x1FFFFFFF
 
 enum { COMPILE=1, DEFINE=2, INTERP=3, COMMENT=4 };
+enum { DSPA=0, RSPA, LSPA, TSPA, ASPA, HA, LA, BA, SA, VHA, INSPA, BLKA };
 
 typedef CELL_T cell;
 typedef WC_T wc_t;
@@ -69,8 +70,23 @@ typedef struct { wc_t xt; byte fl, ln; char nm[NAME_LEN+1]; } DE_T;
 typedef struct { wc_t op; const char *name; byte fl; } PRIM_T;
 typedef struct { uint16_t num, seq, flags; char data[BLOCK_SZ]; } CACHE_T;
 
+#define dsp           code[DSPA]
+#define rsp           code[RSPA]
+#define lsp           code[LSPA]
+#define tsp           code[TSPA]
+#define asp           code[ASPA]
+#define here          code[HA]
+#define last          code[LA]
+#define base          code[BA]
+#define state         code[SA]
+#define vhere         code[VHA]
+#define inSp          code[INSPA]
+#define block         code[BLKA]
+#define TOS           dstk[dsp]
+#define NOS           dstk[dsp-1]
+
 // These are defined by c4.cpp
-extern cell block;
+extern wc_t *code;
 extern void push(cell x);
 extern cell pop();
 extern void inPush(char *in);
