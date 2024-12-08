@@ -1,17 +1,17 @@
-# c4: a Forth system inspired by Tachyon and ColorForth
+# c4a: a Forth system for Arduino, inspired by ColorForth and Tachyon
 
-## Tachyon's influence on C4
-In C4, a program is a sequence of WORD-CODEs. <br/>
+## ColorForth's influence on C4A
+C4A supports control characters in the whitespace that change the state.<br/>
+C4A has 4 states: INTERPRET, COMPILE, DEFINE, AND COMMENT,<br/>
+C4A also supports the standard state-change words.<br/>
+
+## Tachyon's influence on C4A
+In C4A, a program is a sequence of WORD-CODEs. <br/>
 A WORD-CODE is a 32-bit unsigned number (a DWORD). <br/>
 Primitives are assigned numbers sequentially from 0 to **BYE**. <br/>
 If a WORD-CODE is less than or equal to **BYE**, it is a primitive. <br/>
 If the top 3 bits are set, it is a 29-bit unsigned literal, 0-$1FFFFFFF. <br/>
 If it is between **BYE**, and $E0000000, it is the code address of a word to execute. <br/>
-
-## ColorForth's influence on C4
-C4 supports control characters in the whitespace that change the state.<br/>
-C4 has 4 states: INTERPRET, COMPILE, DEFINE, AND COMMENT,<br/>
-C4 also supports the standard state-change words.<br/>
 
 | Ascii | Word  | State | Description|
 |:--    |:--    |:--    |:-- |
@@ -22,23 +22,23 @@ C4 also supports the standard state-change words.<br/>
 |       |  (    |   4   | Comment, save current state |
 |       |  )    |       | End comment, restores saved state |
 
-**NOTE**: In the DEFINE state, C4 changes the state to COMPILE after adding the next word.<br/>
+**NOTE**: In the DEFINE state, C4A changes the state to COMPILE after adding the next word.<br/>
 **NOTE**: Unlike ColorForth, ';' compiles EXIT and then changes the state to INTERPRET.<br/>
 
-## CELLs in C4
+## CELLs in C4A
 A **CELL** is either 32-bits or 64-bits, depending on the target system.
 - Linux 32-bit (-m32): a CELL is 32-bits.
 - Linux 64-bit (-m64): a CELL is 64-bits.
 - Windows 32-bit (x86): a CELL is 32-bits.
 - Windows 64-bit (x64): a CELL is 64-bits.
 
-## C4 memory areas
-C4 provides a single memory area. See 'mem-sz' for its size.
+## C4A memory areas
+C4A provides a single memory area. See 'mem-sz' for its size.
 - It is broken into 3 areas: CODE, VARS, and DICT.
 - The CODE area is an aray of WORD-CODEs starting at the beginning of the memory.
   - `here` is an offset into the CODE area.
-  - **NOTE**: CODE slots 0-25 (`0 wc@ .. 25 wc@`) are reserved for C4 system values.
-  - **NOTE**: CODE slots 26-75 (`26 wc@` .. `75 wc@`) are unused by C4.
+  - **NOTE**: CODE slots 0-25 (`0 wc@ .. 25 wc@`) are reserved for C4A system values.
+  - **NOTE**: CODE slots 26-75 (`26 wc@` .. `75 wc@`) are unused by C4A.
   - **NOTE**: These are free for the application to use as desired.
   - **NOTE**: Use `wc@` and `wc!` to get and set WORD-CODE values in the code area.
 - The VARS area is arbitrarily defined to begin at address &memory[200000].
@@ -50,8 +50,8 @@ C4 provides a single memory area. See 'mem-sz' for its size.
 
 | WORD    | STACK | DESCRIPTION |
 |:--      |:--    |:-- |
-| memory  | (--A) | A: starting address of the C4 memory |
-| mem-sz  | (--N) | N: size in BYTEs of the C4 memory |
+| memory  | (--A) | A: starting address of the C4A memory |
+| mem-sz  | (--N) | N: size in BYTEs of the C4A memory |
 | dstk-sz | (--N) | N: size in CELLs of the DATA and RETURN stacks |
 | tstk-sz | (--N) | N: size in CELLs of the A and T stacks |
 | wc-sz   | (--N) | N: size in BYTEs of a WORD-CODE |
@@ -66,11 +66,11 @@ C4 provides a single memory area. See 'mem-sz' for its size.
 | base    | (--N) | N: CODE slot for the BASE variable |
 | state   | (--N) | N: CODE slot for the STATE variable |
 
-## C4 Strings
-Strings in C4 are NULL-terminated with no count byte.<br/>
+## C4A Strings
+Strings in C4A are NULL-terminated with no count byte.<br/>
 
 ## Format specifiers in `ftype` and `."`
-Similar to the printf() function in C, C4 supports formatted output using '%'. <br/>
+Similar to the printf() function in C, C4A supports formatted output using '%'. <br/>
 For example `: ascii dup dup dup ." char %c, decimal #%d, binary: %%%b, hex: $%x%n" ;`.
 
 | Format | Stack | Description |
@@ -88,8 +88,8 @@ For example `: ascii dup dup dup ." char %c, decimal #%d, binary: %%%b, hex: $%x
 | %[x]   | (--)  | EMIT [x]. |
 
 ## The A stack
-C4 includes an A stack. <br/>
-This is somewhat similar to MachineForth's operations for 'a', but in C4, it is a stack.<br/>
+C4A includes an A stack. <br/>
+This is somewhat similar to MachineForth's operations for 'a', but in C4A, it is a stack.<br/>
 The size of the A stack is configurable (see `tstk-sz`).<br/>
 
 | WORD  | STACK | DESCRIPTION |
@@ -103,7 +103,7 @@ The size of the A stack is configurable (see `tstk-sz`).<br/>
 | adrop | (--)  | Drop A-TOS |
 
 ## The T Stack
-C4 includes a T stack, with same ops as the A stack. <br/>
+C4A includes a T stack, with same ops as the A stack. <br/>
 Note that there are also additional words for the return stack. <br/>
 
 | WORD  | STACK | DESCRIPTION |
@@ -116,7 +116,7 @@ Note that there are also additional words for the return stack. <br/>
 | `t>`  | (--N) | Pop N from the T stack. |
 | tdrop | (--)  | Drop T-TOS |
 
-## C4 WORD-CODE primitives
+## C4A WORD-CODE primitives
 Stack effect notation conventions:
 
 | TERM     | DESCRIPTION |
@@ -201,7 +201,7 @@ The primitives:
 | next-wd     | (--L)        | L: length of the next word from the input stream |
 | immediate   | (--)         | Mark the last created word as IMMEDIATE |
 | inline      | (--)         | Mark the last created word as INLINE |
-| outer       | (S--)        | Send string S to the C4 outer interpreter |
+| outer       | (S--)        | Send string S to the C4A outer interpreter |
 | addword     | (--)         | Add the next word to the dictionary |
 | timer       | (--N)        | N: Current time |
 | see X       | (--)         | Output the definition of word X |
@@ -231,8 +231,8 @@ The primitives:
 | flush-block | (N F--)      | N: Block number, F: True => clear cache entry |
 | load-next   | (N--)        | Close the current block and load block N next |
 | system      | (S--)        | PC ONLY: S: String to send to `system()` |
-| bye         | (--)         | PC ONLY: Exit C4 |
+| bye         | (--)         | PC ONLY: Exit C4A |
 
-## C4 default words
+## C4A default words
 Default words are defined in function `sys_load()` in file sys-load.c.<br/>
 For details, or to add or change the default words, modify that function.
