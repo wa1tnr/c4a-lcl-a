@@ -1,10 +1,25 @@
 #include "c4a.h"
 
-#define NCASE         goto next; case
-#define BCASE         break; case
+#define dsp           code[DSPA]
+#define rsp           code[RSPA]
+#define lsp           code[LSPA]
+#define tsp           code[TSPA]
+#define asp           code[ASPA]
+#define here          code[HA]
+#define last          code[LA]
+#define base          code[BA]
+#define state         code[SA]
+#define vhere         code[VHA]
+#define inSp          code[INSPA]
+#define block         code[BLKA]
+
+#define TOS           dstk[dsp]
+#define NOS           dstk[dsp-1]
 #define L0            lstk[lsp]
 #define L1            lstk[lsp-1]
 #define L2            lstk[lsp-2]
+#define NCASE         goto next; case
+#define BCASE         break; case
 
 byte memory[MEM_SZ+1];
 wc_t *code = (wc_t*)&memory[0];
@@ -103,7 +118,8 @@ char wd[32], *toIn, *inStk[FSTK_SZ+1];
 	X(BCACHE,  "blocks",    0, dumpCache(); ) \
 	X(BADDR, "block-addr",  0, t=pop(); push((cell)blockAddr(t)); ) \
 	X(FLUSH,   "flush",     0, flushBlocks(pop()); ) \
-	X(FLBLK, "flush-block", 0, t=pop(); n=pop(); flushBlock(n, 0, t); )
+	X(FLBLK, "flush-block", 0, t=pop(); n=pop(); flushBlock(n, 0, t); ) \
+	X(EDIT,    "edit",      0, t=pop(); editBlock(t); )
 #else
     #define PRIMS_FILE
 #endif // FILE_NONE
@@ -111,7 +127,6 @@ char wd[32], *toIn, *inStk[FSTK_SZ+1];
 #ifdef IS_PC
   #define PRIMS_SYSTEM \
 	X(SYSTEM,  "system", 0, t=pop(); ttyMode(0); system((char*)t); ) \
-	X(EDIT,    "edit",   0, t=pop(); editBlock(t); ) \
 	X(BYE,     "bye",    0, ttyMode(0); fileExit(); exit(0); )
 #else // Must be a dev board ...
   #define PRIMS_SYSTEM \
@@ -148,6 +163,8 @@ void comma(cell x) { code[here++] = (wc_t)x; }
 void commaCell(cell n) { store32((cell)&code[here], n); here += (CELL_SZ / WC_SZ); }
 int  changeState(int x) { state = x; return x; }
 void ok() { if (state==0) { state=INTERP; } zType((state==INTERP) ? " ok\r\n" : "... "); }
+wc_t getWCat(cell addr) { return code[addr]; }
+void setWCat(cell addr, wc_t val) { code[addr] = val; }
 
 int strEqI(const char *s, const char *d) {
 	while (lower(*s) == lower(*d)) { if (*s == 0) { return 1; } s++; d++; }

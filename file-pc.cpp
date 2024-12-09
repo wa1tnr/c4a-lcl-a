@@ -14,7 +14,8 @@ void fileClose(cell fh) { fclose((FILE*)fh); }
 void fileDelete(const char *name) { remove(name); }
 cell fileRead(char *buf, int sz, cell fh) { return fread(buf, 1, sz, makeIn(fh)); }
 cell fileWrite(char *buf, int sz, cell fh) { return fwrite(buf, 1, sz, makeOut(fh)); }
-cell fileSeek(cell fh, cell pos) { return fseek((FILE*)fh,pos,SEEK_SET); }
+cell fileSeek(cell fh, cell pos) { return fseek((FILE*)fh,pos,SEEK_SET) ? 1 : 0; }
+cell filePos(cell fh) { return ftell((FILE*)fh); }
 void fileInit() { blockInit(); }
 void fileExit() { flushBlocks(0); }
 

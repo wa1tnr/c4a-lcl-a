@@ -10,8 +10,20 @@ CACHE_T blockCache[BLOCK_CACHE_SZ];
 static uint16_t seq;
 extern char *toIn;
 
+#ifdef FILE_PC
+  #define FL_READ  "rb"
+  #define FL_RW    "r+b"
+  #define FL_WRITE "wb"
+  #define FL_WR    "w+b"
+#else
+  #define FL_READ  "r"
+  #define FL_RW    "r+"
+  #define FL_WRITE "w"
+  #define FL_WR    "w+"
+#endif
+
 static void dumpCacheEntry(const char *msg, CACHE_T *p) {
-    zTypeF("%s: blk:%u, seq:%u, flgs:%u\n",msg, p->num, p->seq, p->flags);
+    zTypeF("%s: blk:%u, seq:%u, flgs:%u\r\n",msg, p->num, p->seq, p->flags);
 }
 
 void dumpCache() {
@@ -33,12 +45,12 @@ void blockInit() {
 static void readBlock(CACHE_T *p) {
     // dumpCacheEntry("read", p);
     for (int i=0; i<BLOCK_SZ; i++) { p->data[i] = 0; }
-    cell fh=fileOpen("blocks.fth","rb");
+    cell fh=fileOpen("blocks.fth",FL_READ);
     if (fh) {
         cell req = p->num*BLOCK_SZ;
         fileSeek(fh, req);
-        cell pos = ftell((FILE*)fh);
-        // zTypeF("-req:%d,pos:%d-", req, pos); key();
+        cell pos = filePos(fh);
+        // zTypeF("-req:%d,pos:%d-", req, pos);
         if (req == pos) { fileRead(p->data, BLOCK_SZ, fh); }
         else { zType("-error reading block-"); }
         fileClose(fh);
@@ -48,12 +60,13 @@ static void readBlock(CACHE_T *p) {
 
 static void writeBlock(CACHE_T *p) {
     dumpCacheEntry("write", p);
-    cell fh=fileOpen("blocks.fth","r+b");
-    if (!fh) { fh=fileOpen("blocks.fth", "wb"); }
+    cell fh=fileOpen("blocks.fth",FL_RW);
+    if (!fh) { fh=fileOpen("blocks.fth", FL_WRITE); }
     if (fh) {
         cell req = p->num*BLOCK_SZ;
         fileSeek(fh, req);
-        cell pos = ftell((FILE*)fh);
+        cell pos = filePos(fh);
+        zTypeF("-writeBlock:req=%d,pos=%d-",req,pos);
         if (pos == req) { fileWrite(p->data, BLOCK_SZ, fh); }
         else { zType(" -error writing block-"); }
         fileClose(fh);

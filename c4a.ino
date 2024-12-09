@@ -76,7 +76,7 @@ void loop() {
   if (c==9) { c = 32; }
   if (c==13) {
       *(in) = 0;
-      outer(tib);
+      emit(32); outer(tib);
       ok();
       in = 0;
   } else if ((c==8) || (c==127)) {

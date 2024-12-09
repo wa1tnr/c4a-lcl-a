@@ -1,7 +1,7 @@
 block #005 - screen
 find cls loaded?
-cur-on(-)." %e[?25h" ;        cur-off(--)." %e[?25l" ;
-cur-block(-)." %e[2 q" ;      cur-bar(--)." %e[5 q" ;
+cur-on(--)." %e[?25h" ;       cur-off(--)." %e[?25l" ;
+cur-block(--)." %e[2 q" ;     cur-bar(--)." %e[5 q" ;
 ->cr(r c--)." %e[%d;%dH" ;    ->rc(c r--) swap ->cr ;
 cls(--)." %e[2J" 1 1 ->rc ;   clr-eol(--)." %e[0K" ;
 color(bg fg--)." %e[%d;%dm" ; fg(fg--)." %e[38;5;%dm" ;

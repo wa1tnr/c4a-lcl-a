@@ -24,9 +24,10 @@ enum { NORMAL=1, INSERT, REPLACE, QUIT };
 enum { Up=7240, Dn=7248, Rt=7245, Lt=7243, Home=7239, PgUp=7241, PgDn=7249,
     End=7247, Ins=7250, Del=7251, CHome=7287 };
 
-static cell line, off, edMode, isDirty, isShow;
+static cell line, off, edMode, isDirty, isShow, block;
 static char edBuf[BLOCK_SZ], yanked[NUM_COLS+1], *curLine;
 
+static void setBlock(wc_t blk) { setWCat(BLKA, blk); block=blk; }
 static void GotoXY(int x, int y) { zTypeF("\x1B[%d;%dH", y, x); }
 static void CLS() { zType("\x1B[2J"); GotoXY(1, 1); }
 static void ClearEOL() { zType("\x1B[K"); }
@@ -282,8 +283,17 @@ static void edCommand() {
     }
 }
 
-static void PageUp() { if (0 < block) { edSvBlk(0); block--; edRdBlk(); line = off = 0; } }
-static void PageDn() { edSvBlk(0); block++; edRdBlk(); line = off = 0; }
+static void PageUp() {
+    if (0 < block) {
+        edSvBlk(0); setBlock(block-1);
+        edRdBlk(); line = off = 0;
+    }
+}
+
+static void PageDn() {
+    edSvBlk(0); setBlock(block+1);
+    edRdBlk(); line = off = 0;
+}
 
 static void toText() {
     char x[NUM_COLS+1];
@@ -449,7 +459,7 @@ static void showEditor() {
 }
 
 void editBlock(cell blk) {
-    block = blk;
+    setBlock(blk);
     line = off = 0;
     CLS();
     edRdBlk();

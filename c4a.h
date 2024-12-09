@@ -33,7 +33,7 @@
 #define FILE_PC
 #else
   #include <Arduino.h>
-  #define MEM_SZ      320*1024
+  #define MEM_SZ      400*1024 // These are for a RPi PICO 2 (2350)
   #define STK_SZ            64 // Data stack
   #define RSTK_SZ           64 // Return stack
   #define LSTK_SZ           45 // 15 nested loops (3 entries per loop)
@@ -69,23 +69,8 @@ typedef struct { wc_t xt; byte fl, ln; char nm[NAME_LEN+1]; } DE_T;
 typedef struct { wc_t op; const char *name; byte fl; } PRIM_T;
 typedef struct { uint16_t num, seq, flags; char data[BLOCK_SZ]; } CACHE_T;
 
-#define dsp           code[DSPA]
-#define rsp           code[RSPA]
-#define lsp           code[LSPA]
-#define tsp           code[TSPA]
-#define asp           code[ASPA]
-#define here          code[HA]
-#define last          code[LA]
-#define base          code[BA]
-#define state         code[SA]
-#define vhere         code[VHA]
-#define inSp          code[INSPA]
-#define block         code[BLKA]
-#define TOS           dstk[dsp]
-#define NOS           dstk[dsp-1]
-
 // These are defined by c4.cpp
-extern wc_t *code;
+extern void c4Init();
 extern void push(cell x);
 extern cell pop();
 extern void inPush(char *in);
@@ -100,7 +85,8 @@ extern int  changeState(int x);
 extern void inner(wc_t start);
 extern void outer(const char *src);
 extern void outerF(const char *fmt, ...);
-extern void c4Init();
+extern wc_t getWCat(cell addr);
+extern void setWCat(cell addr, wc_t val);
 extern void ok();
 
 // c4.cpp needs these to be defined
@@ -126,6 +112,7 @@ extern void fileDelete(const char *name);
 extern cell fileRead(char *buf, int sz, cell fh);
 extern cell fileWrite(char *buf, int sz, cell fh);
 extern cell fileSeek(cell fh, cell pos);
+extern cell filePos(cell fh);
 extern void fileLoad(const char *name);
 
 // Blocks

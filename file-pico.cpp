@@ -10,33 +10,37 @@
 
 #define myFS LittleFS
 
-#define NFILES 1
+#define NFILES 16
 cell inputFp, outputFp;
 static char fn[32];
-File files[NFILES+1];
-char blockData[NUM_BLOCKS][BLOCK_SZ];
+static File files[NFILES+1];
 
-void readBlocks() { } // TODO
-void writeBlocks() { } // TODO
-char *blockAddr(cell Blk) { return btwi(Blk,0,NUM_BLOCKS) ? &blockData[Blk][0] : 0; }
+static int isValidFile(cell fh) { return btwi(fh, 1, NFILES) ? 1 : 0; }
 
 void fileInit() {
     FSInfo fsinfo;
-	zType("\nLittleFS: begin ... ");
+	zType("\r\nLittleFS: begin ... ");
 	myFS.begin();
 	zType("done.");
-	zType("\nLittleFS: initialized\n");
+	zType("\r\nLittleFS: initialized\r\n");
     LittleFS.info(fsinfo);
-	zTypeF("\nBytes total: %llu, used: %llu", fsinfo.totalBytes, fsinfo.usedBytes);
+	zTypeF("\r\nBytes total: %llu, used: %llu", fsinfo.totalBytes, fsinfo.usedBytes);
 	inputFp = 0;
 	for (int i=0; i<=NFILES; i++) { files[i] = File(); }
-	readBlocks();
+    blockInit();
 }
 
+static cell freeFileSlot() {
+	for (int i = 1; i <= NFILES; i++) {
+		if ((bool)files[i] == false) { return i; }
+	}
+	return 0;
+}
 
 cell fileOpen(const char *fn, const char *mode) {
-	int fh = 1;
-	if (0 < fh) {
+	int fh = freeFileSlot();
+    zTypeF("-fopen:fh=%d,md=%s-",fh,mode);
+	if (fh) {
 		files[fh] = myFS.open((char*)fn, mode);
         if (files[fh].name() == nullptr) { return 0; }
         if (mode[0] == 'w') { files[fh].truncate(0); }
@@ -44,24 +48,29 @@ cell fileOpen(const char *fn, const char *mode) {
 	return fh;
 }
 
-void fileClose(cell fh) {
-    if (btwi(fh,1,NFILES)) { files[fh].close(); }
-}
-
-void fileDelete(const char *name) {
-    myFS.remove(name);
-}
+void fileClose(cell fh) { if (isValidFile(fh)) { files[fh].close(); } }
+void fileDelete(const char *name) { myFS.remove(name); }
 
 cell fileRead(char *buf, int sz, cell fh) {
-	return (btwi(fh, 1, NFILES)) ? (int)files[fh].read((uint8_t*)buf, sz) : 0;
+	return (isValidFile(fh)) ? (int)files[fh].read((uint8_t*)buf, sz) : 0;
+}
+
+cell fileSeek(cell fh, cell pos) {
+    if (isValidFile(fh)) {
+        return files[fh].seek(pos) ? 1 : 0;
+    }
+    return 0;
+}
+
+cell filePos(cell fh) {
+    if (isValidFile(fh)) {
+        return files[fh].position();
+    }
+    return 0;
 }
 
 cell fileWrite(char *buf, int sz, cell fh) {
-	return (btwi(fh, 1, NFILES)) ? (int)files[fh].write(buf, sz) : 0;
+	return (isValidFile(fh)) ? (int)files[fh].write(buf, sz) : 0;
 }
-
-
-void blockLoad(int blk) { /* TODO */ }
-void blockLoadNext(int blk) { /* TODO */ }
 
 #endif // FILE_PICO
