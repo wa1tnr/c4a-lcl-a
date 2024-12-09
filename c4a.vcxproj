@@ -145,7 +145,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="block-000.fth" />
+    <None Include="block-001.fth" />
+    <None Include="block-002.fth" />
+    <None Include="block-003.fth" />
+    <None Include="block-004.fth" />
+    <None Include="block-005.fth" />
     <None Include="blocks.fth" />
+    <None Include="c4a.ino" />
     <None Include="Editor.md" />
     <None Include="LICENSE" />
     <None Include="makefile" />
@@ -153,7 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="block.cpp" />
-    <ClCompile Include="c4.cpp" />
+    <ClCompile Include="c4a.cpp" />
     <ClCompile Include="editor.cpp" />
     <ClCompile Include="file-pc.cpp" />
     <ClCompile Include="file-pico.cpp" />

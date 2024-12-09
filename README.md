@@ -26,11 +26,31 @@ If it is between **BYE**, and $E0000000, it is the code address of a word to exe
 **NOTE**: Unlike ColorForth, ';' compiles EXIT and then changes the state to INTERPRET.<br/>
 
 ## CELLs in C4A
-A **CELL** is either 32-bits or 64-bits, depending on the target system.
-- Linux 32-bit (-m32): a CELL is 32-bits.
-- Linux 64-bit (-m64): a CELL is 64-bits.
-- Windows 32-bit (x86): a CELL is 32-bits.
-- Windows 64-bit (x64): a CELL is 64-bits.
+A **CELL** in C4A is 32-bits. For PCs, only 32-bit platforms are supported.
+
+## Building C4A
+- **NOTE** c4a is primarily for development boards, not PCs.
+  - For PCs, there is c4: https://github.com/CCurl/c4
+  - Even so, c4a can still be built and run on Windows and Linux systems, mostly for testing.
+  - But since dev boards don't support 64-bits, neither does c4a.
+- Windows: there is a c4a.sln file for Visual Studio
+  - only the x86 target is supportes
+- Linux: there is a makefile
+  - only the 32-bit configuration is supported
+
+### Development boards via the Arduino IDE:
+- I use the Arduino IDE v2.0
+- There is a c3.ino file
+- File `c4a.h` controls parameters for the target board
+- Edit the section where isBOARD is defined to set the configuration for the board
+- Use `#define FILE_NONE` to disable support for blocks and LittleFS
+- For the RPI Pico:
+  - Use the arduino-pico from earlephilhower (https://github.com/earlephilhower/arduino-pico)
+  - The version must be 4.2.0 or later. Versions older than 4.0.0 do not support boards using
+    the RP2350 microcontroller.
+  - Use `#define FILE_PICO` to include support for LittleFS
+- For the Teensy-4.x:
+  - Use `#define FILE_TEENSY` to include support for LittleFS
 
 ## C4A memory areas
 C4A provides a single memory area. See 'mem-sz' for its size.

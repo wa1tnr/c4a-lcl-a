@@ -1,5 +1,4 @@
-ARCH ?= 32
-CFLAGS = -O3 -m$(ARCH)
+CFLAGS = -O3 -m32
 srcfiles := $(shell find . -name "*.cpp")
 incfiles := $(shell find . -name "*.h")
 
