@@ -34,9 +34,9 @@ A **CELL** in C4A is 32-bits. For PCs, only 32-bit platforms are supported.
   - Even so, c4a can still be built and run on Windows and Linux systems, mostly for testing.
   - But since dev boards don't support 64-bits, neither does c4a.
 - Windows: there is a c4a.sln file for Visual Studio
-  - only the x86 target is supportes
+  - only the x86 target is supported
 - Linux: there is a makefile
-  - only the 32-bit configuration is supported
+  - only the 32-bit configuration (-m32) is supported
 
 ### Development boards via the Arduino IDE:
 - I use the Arduino IDE v2.0
