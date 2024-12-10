@@ -1,17 +1,9 @@
-# c4a: a Forth system for Arduino, inspired by ColorForth and Tachyon
+# c4a: a Forth system for Arduino and PCs, inspired by ColorForth and Tachyon
 
 ## ColorForth's influence on C4A
 C4A supports control characters in the whitespace that change the state.<br/>
 C4A has 4 states: INTERPRET, COMPILE, DEFINE, AND COMMENT,<br/>
 C4A also supports the standard state-change words.<br/>
-
-## Tachyon's influence on C4A
-In C4A, a program is a sequence of WORD-CODEs. <br/>
-A WORD-CODE is a 32-bit unsigned number (a DWORD). <br/>
-Primitives are assigned numbers sequentially from 0 to **BYE**. <br/>
-If a WORD-CODE is less than or equal to **BYE**, it is a primitive. <br/>
-If the top 3 bits are set, it is a 29-bit unsigned literal, 0-$1FFFFFFF. <br/>
-If it is between **BYE**, and $E0000000, it is the code address of a word to execute. <br/>
 
 | Ascii | Word  | State | Description|
 |:--    |:--    |:--    |:-- |
@@ -25,18 +17,29 @@ If it is between **BYE**, and $E0000000, it is the code address of a word to exe
 **NOTE**: In the DEFINE state, C4A changes the state to COMPILE after adding the next word.<br/>
 **NOTE**: Unlike ColorForth, ';' compiles EXIT and then changes the state to INTERPRET.<br/>
 
+## Tachyon's influence on C4A
+In C4A, a program is a sequence of WORD-CODEs. <br/>
+A WORD-CODE is a 32-bit unsigned number (i.e. - a DWORD). <br/>
+Primitives are assigned numbers sequentially from 0 to [BYE]. <br/>
+If a WORD-CODE is less than or equal to [BYE], it is a primitive. <br/>
+If the top 3 bits are set, it is a 29-bit unsigned literal, 0-$1FFFFFFF. <br/>
+If it is between [BYE], and $E0000000, it is the code address of a word to execute. <br/>
+
 ## CELLs in C4A
-A **CELL** in C4A is 32-bits. For PCs, only 32-bit platforms are supported.
+A **CELL** in C4A is 32-bits, the same size as a **WORD-CODE**. For PCs, only 32-bit platforms are supported.
 
 ## Building C4A
-- **NOTE** c4a is primarily for development boards, not PCs.
-  - For PCs, there is c4: https://github.com/CCurl/c4
-  - Even so, c4a can still be built and run on Windows and Linux systems, mostly for testing.
-  - But since dev boards don't support 64-bits, neither does c4a.
+- **NOTE** c4a is primarily for development boards, not PCs (see c4: https://github.com/CCurl/c4).
+  - But c4a can be built and run on Windows and Linux systems.
+  - Since development boards don't support 64-bits, neither does c4a.
+ 
+## PCs - Windows and Linux, and probably others
 - Windows: there is a c4a.sln file for Visual Studio
   - only the x86 target is supported
 - Linux: there is a makefile
   - only the 32-bit configuration (-m32) is supported
+- Others:
+  - c4a is simple enough that it should be easy to migrate it to any platform
 
 ### Development boards via the Arduino IDE:
 - I use the Arduino IDE v2.0
@@ -53,16 +56,17 @@ A **CELL** in C4A is 32-bits. For PCs, only 32-bit platforms are supported.
   - Use `#define FILE_TEENSY` to include support for LittleFS
 
 ## C4A memory areas
-C4A provides a single memory area. See 'mem-sz' for its size.
+C4A provides a single memory area. See 'mem-sz' (MEM_SZ in c4a.h) for its size.
 - It is broken into 3 areas: CODE, VARS, and DICT.
 - The CODE area is an aray of WORD-CODEs starting at the beginning of the memory.
   - `here` is an offset into the CODE area.
-  - **NOTE**: CODE slots 0-25 (`0 wc@ .. 25 wc@`) are reserved for C4A system values.
-  - **NOTE**: CODE slots 26-75 (`26 wc@` .. `75 wc@`) are unused by C4A.
-  - **NOTE**: These are free for the application to use as desired.
+  - The size of the CODE area is `code-sz`. See 'code-sz' (CODE_SZ in c4a.h).
   - **NOTE**: Use `wc@` and `wc!` to get and set WORD-CODE values in the code area.
-- The VARS area is arbitrarily defined to begin at address &memory[200000].
-  - This value can be changed for any reason. See sys-load.c.
+  - **NOTE**: CODE slots 0-25 (`0 wc@ .. 25 wc@`) are reserved for C4A system values.
+  - **NOTE**: CODE slots 26-[BYE] (`26 wc@` .. `[BYE] wc@`) are unused by C4A.
+  - **NOTE**: So c4a provides space for about 75 'free' variables.
+  - **NOTE**: These are free for the user/application to use as desired.
+- The VARS area is defined to begin at address `code-sz wc-sz * memory +`.
   - `vhere` is the absolute address of the first free byte the VARS area.
 - The DICT is at the end of the memory. 'last' grows toward the beginning of the memory.
   - `last` is an offset into the memory area.
@@ -72,6 +76,7 @@ C4A provides a single memory area. See 'mem-sz' for its size.
 |:--      |:--    |:-- |
 | memory  | (--A) | A: starting address of the C4A memory |
 | mem-sz  | (--N) | N: size in BYTEs of the C4A memory |
+| code-sz | (--N) | N: number of in WORD-CODE slots in the code area |
 | dstk-sz | (--N) | N: size in CELLs of the DATA and RETURN stacks |
 | tstk-sz | (--N) | N: size in CELLs of the A and T stacks |
 | wc-sz   | (--N) | N: size in BYTEs of a WORD-CODE |
@@ -123,7 +128,7 @@ The size of the A stack is configurable (see `tstk-sz`).<br/>
 | adrop | (--)  | Drop A-TOS |
 
 ## The T Stack
-C4A includes a T stack, with same ops as the A stack. <br/>
+C4A includes a T stack, with tge same operations as the A stack. <br/>
 Note that there are also additional words for the return stack. <br/>
 
 | WORD  | STACK | DESCRIPTION |
