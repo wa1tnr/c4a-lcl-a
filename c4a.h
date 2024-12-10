@@ -30,6 +30,7 @@
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
   #define CODE_SLOTS   32*1024 // 32*1024*4 = 128k bytes
   #define BLOCK_CACHE_SZ    32 // Each block is 1024 bytes
+  #define BLOCK_MAX       1023 // Maximim block
 #define FILE_PC
 #else
   #include <Arduino.h>
@@ -42,6 +43,7 @@
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
   #define CODE_SLOTS   32*1024 // 32*1024*4 = 128k
   #define BLOCK_CACHE_SZ    16 // Each block is 1024 bytes
+  #define BLOCK_MAX        255 // Maximim block
   // #define FILE_NONE
   #define FILE_PICO
   // #define FILE_TEENSY

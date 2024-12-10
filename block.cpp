@@ -62,20 +62,29 @@ static void writeBlock(CACHE_T *p) {
     dumpCacheEntry("write", p);
     cell fh=fileOpen("blocks.fth",FL_RW);
     if (!fh) { fh=fileOpen("blocks.fth", FL_WRITE); }
-    if (fh) {
-        cell req = p->num*BLOCK_SZ;
-        fileSeek(fh, req);
-        cell pos = filePos(fh);
-        zTypeF("-writeBlock:req=%d,pos=%d-",req,pos);
-        if (pos == req) { fileWrite(p->data, BLOCK_SZ, fh); }
-        else { zType(" -error writing block-"); }
-        fileClose(fh);
+    if (!fh) { zType("-can't open blocks.fth-"); return; }
+    cell req = p->num*BLOCK_SZ;
+    fileSeek(fh, req);
+    cell pos = filePos(fh);
+    if (pos < req) { // Extend if necessary
+        zTypeF("-extending to %d ...",req);
+        char buf[BLOCK_SZ];
+        for (int i=0; i<BLOCK_SZ; i++) { buf[i] = 0; }
+        while (pos < req) {
+            fileWrite(buf, BLOCK_SZ, fh);
+            pos = filePos(fh);
+            zTypeF(" %d",pos);
+        }
+        emit('-');
     }
+    fileWrite(p->data, BLOCK_SZ, fh);
+    fileClose(fh);
     p->flags &= BLOCK_CLEAN;
 }
 
 static CACHE_T *findBlock(int blk) {
     // zTypeF("find: %d", blk);
+    if (BLOCK_MAX < blk) { zType("-block too big!-\n"); return 0; }
     for (int i=0; i<BLOCK_CACHE_SZ; i++) {
         CACHE_T* q = &blockCache[i];
         if (q->num == blk) { q->seq = ++seq; return q; } // Found
@@ -110,8 +119,9 @@ void flushBlocks(cell clear) {
     if (clear) { seq = 0; }
 }
 
+static void prepForLoad() { toIn[BLOCK_SZ-1]=0; changeState(INTERP); }
 char *blockAddr(cell blk) { return &findBlock(blk)->data[0]; }
-void blockLoadNext(int blk) { toIn=blockAddr(blk); toIn[BLOCK_SZ-1]=0; }
+void blockLoadNext(int blk) { toIn=blockAddr(blk); prepForLoad(); }
 void blockLoad(int blk) { inPush(toIn); blockLoadNext(blk); }
 void blockIsDirty(int blk) { findBlock(blk)->flags |= BLOCK_DIRTY; }
 
