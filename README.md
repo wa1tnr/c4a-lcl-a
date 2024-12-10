@@ -1,9 +1,9 @@
-# c4a: a Forth system for Arduino and PCs, inspired by ColorForth and Tachyon
+# c4a: a 32-bit Forth system for PCs and Arduino, inspired by ColorForth and Tachyon
 
 ## ColorForth's influence on C4A
-C4A supports control characters in the whitespace that change the state.<br/>
-C4A has 4 states: INTERPRET, COMPILE, DEFINE, AND COMMENT,<br/>
-C4A also supports the standard state-change words.<br/>
+- C4A supports control characters in the whitespace that change the state.<br/>
+- C4A has 4 states: INTERPRET, COMPILE, DEFINE, AND COMMENT,<br/>
+- C4A also supports the standard state-change words.<br/>
 
 | Ascii | Word  | State | Description|
 |:--    |:--    |:--    |:-- |
@@ -18,22 +18,22 @@ C4A also supports the standard state-change words.<br/>
 **NOTE**: Unlike ColorForth, ';' compiles EXIT and then changes the state to INTERPRET.<br/>
 
 ## Tachyon's influence on C4A
-In C4A, a program is a sequence of WORD-CODEs. <br/>
-A WORD-CODE is a 32-bit unsigned number (i.e. - a DWORD). <br/>
-Primitives are assigned numbers sequentially from 0 to [BYE]. <br/>
-If a WORD-CODE is less than or equal to [BYE], it is a primitive. <br/>
-If the top 3 bits are set, it is a 29-bit unsigned literal, 0-$1FFFFFFF. <br/>
-If it is between [BYE], and $E0000000, it is the code address of a word to execute. <br/>
+- In C4A, a program is a sequence of WORD-CODEs. <br/>
+- A WORD-CODE is a 32-bit unsigned number (i.e. - a DWORD). <br/>
+- Primitives are assigned numbers sequentially from 0 to [BYE]. <br/>
+- If a WORD-CODE is less than or equal to [BYE], it is a primitive. <br/>
+- If the top 3 bits are set, it is a 29-bit unsigned literal, 0-$1FFFFFFF. <br/>
+- If it is between [BYE], and $E0000000, it is the code address of a word to execute. <br/>
 
 ## CELLs in C4A
-A **CELL** in C4A is 32-bits, the same size as a **WORD-CODE**. For PCs, only 32-bit platforms are supported.
+- A **CELL** in C4A is 32-bits, the same size as a **WORD-CODE**.
+- Since development boards don't support 64-bits, neither does c4a.
+- For PCs, only 32-bit platforms are supported.
+- For 64-bit systems, see c4: https://github.com/CCurl/c4).
 
 ## Building C4A
-- **NOTE** c4a is primarily for development boards, not PCs (see c4: https://github.com/CCurl/c4).
-  - But c4a can be built and run on Windows and Linux systems.
-  - Since development boards don't support 64-bits, neither does c4a.
  
-## PCs - Windows and Linux, and probably others
+### PCs - Windows and Linux, and probably others
 - Windows: there is a c4a.sln file for Visual Studio
   - only the x86 target is supported
 - Linux: there is a makefile
@@ -259,5 +259,5 @@ The primitives:
 | bye         | (--)         | PC ONLY: Exit C4A |
 
 ## C4A default words
-Default words are defined in function `sys_load()` in file sys-load.c.<br/>
+Default words are defined in function `sys_load()` in file sys-load.cpp.<br/>
 For details, or to add or change the default words, modify that function.
