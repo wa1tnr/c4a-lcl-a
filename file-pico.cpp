@@ -50,6 +50,8 @@ cell fileOpen(const char *fn, const char *mode) {
 
 void fileClose(cell fh) { if (isValidFile(fh)) { files[fh].close(); } }
 void fileDelete(const char *name) { myFS.remove(name); }
+cell fileSize(cell fh) { return (isValidFile(fh)) ? files[fh].size() : 0; }
+cell filePos(cell fh) { return (isValidFile(fh)) ? files[fh].position() : 0; }
 
 cell fileRead(char *buf, int sz, cell fh) {
 	return (isValidFile(fh)) ? (int)files[fh].read((uint8_t*)buf, sz) : 0;
@@ -58,13 +60,6 @@ cell fileRead(char *buf, int sz, cell fh) {
 cell fileSeek(cell fh, cell pos) {
     if (isValidFile(fh)) {
         return files[fh].seek(pos) ? 1 : 0;
-    }
-    return 0;
-}
-
-cell filePos(cell fh) {
-    if (isValidFile(fh)) {
-        return files[fh].position();
     }
     return 0;
 }

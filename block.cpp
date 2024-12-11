@@ -11,15 +11,15 @@ static uint16_t seq;
 extern char *toIn;
 
 #ifdef FILE_PC
-  #define FL_READ  "rb"
-  #define FL_RW    "r+b"
-  #define FL_WRITE "wb"
-  #define FL_WR    "w+b"
+  #define FL_READ    "rb"
+  #define FL_RW      "r+b"
+  #define FL_WRITE   "wb"
+  #define FL_APPEND  "ab"
 #else
-  #define FL_READ  "r"
-  #define FL_RW    "r+"
-  #define FL_WRITE "w"
-  #define FL_WR    "w+"
+  #define FL_READ    "r"
+  #define FL_RW      "r+"
+  #define FL_WRITE   "w"
+  #define FL_APPEND  "a"
 #endif
 
 static void dumpCacheEntry(const char *msg, CACHE_T *p) {
@@ -58,25 +58,33 @@ static void readBlock(CACHE_T *p) {
     p->flags = 0;
 }
 
+static cell extendBlockFile(cell fh, cell req) {
+    cell sz = fileSize(fh);
+    if (req <= sz) { return fh; }
+    char buf[BLOCK_SZ];
+    for (int i=0; i<BLOCK_SZ; i++) { buf[i] = 0; }
+    fileClose(fh);
+    fh = fileOpen("blocks.fth", FL_APPEND);
+    while (sz < req) {
+        if (fileWrite(buf, BLOCK_SZ, fh) < BLOCK_SZ) {
+            fileClose(fh);
+            return 0;
+        }
+        sz += BLOCK_SZ;
+    }
+    fileClose(fh);
+    return fileOpen("blocks.fth", FL_RW);
+}
+
 static void writeBlock(CACHE_T *p) {
     dumpCacheEntry("write", p);
     cell fh=fileOpen("blocks.fth",FL_RW);
     if (!fh) { fh=fileOpen("blocks.fth", FL_WRITE); }
     if (!fh) { zType("-can't open blocks.fth-"); return; }
     cell req = p->num*BLOCK_SZ;
+    fh = extendBlockFile(fh, req);
+    if (!fh) { zType("-error extending blocks.fth-"); return; }
     fileSeek(fh, req);
-    cell pos = filePos(fh);
-    if (pos < req) { // Extend if necessary
-        zTypeF("-extending to %d ...",req);
-        char buf[BLOCK_SZ];
-        for (int i=0; i<BLOCK_SZ; i++) { buf[i] = 0; }
-        while (pos < req) {
-            fileWrite(buf, BLOCK_SZ, fh);
-            pos = filePos(fh);
-            zTypeF(" %d",pos);
-        }
-        emit('-');
-    }
     fileWrite(p->data, BLOCK_SZ, fh);
     fileClose(fh);
     p->flags &= BLOCK_CLEAN;
@@ -84,7 +92,7 @@ static void writeBlock(CACHE_T *p) {
 
 static CACHE_T *findBlock(int blk) {
     // zTypeF("find: %d", blk);
-    if (BLOCK_MAX < blk) { zType("-block too big!-\n"); return 0; }
+    if (BLOCK_MAX < blk) { zType("-block# too high!-\n"); return 0; }
     for (int i=0; i<BLOCK_CACHE_SZ; i++) {
         CACHE_T* q = &blockCache[i];
         if (q->num == blk) { q->seq = ++seq; return q; } // Found

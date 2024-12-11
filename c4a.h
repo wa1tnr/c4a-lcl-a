@@ -110,6 +110,7 @@ extern void fileInit();
 extern void fileExit();
 extern cell fileOpen(const char *name, const char *mode);
 extern void fileClose(cell fh);
+extern cell fileSize(cell fh);
 extern void fileDelete(const char *name);
 extern cell fileRead(char *buf, int sz, cell fh);
 extern cell fileWrite(char *buf, int sz, cell fh);

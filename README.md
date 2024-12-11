@@ -247,14 +247,16 @@ The primitives:
 | fdelete     | (NM--)       | NM: File Name to delete |
 | fread       | (A N FH--X)  | A: Buffer, N: Size, FH: File Handle, X: num chars read |
 | fwrite      | (A N FH--X)  | A: Buffer, N: Size, FH: File Handle, X: num chars written |
-| fgets       | (A N FH--X)  | A: Buffer, N: Size, X: num chars read (0 if EOF/Error) |
-| include X   | (--)         | Load file named X (X: next word) |
+| fseek       | (N FH--X)    | N: Size, FH: File Handle, X: return from func |
+| fsize       | (FH--N)      | FH: File Handle, N: file size |
+| fpos        | (FH--N)      | FH: File Handle, N: current file read/write position |
 | load        | (N--)        | N: Block number to load |
+| load-next   | (N--)        | Close the current block and load block N next |
 | blocks      | (--)         | Dump block cache |
 | block-addr  | (N--A)       | N: Block number, A: Address in cache |
 | flush       | (F--)        | F: True => clear cache |
 | flush-block | (N F--)      | N: Block number, F: True => clear cache entry |
-| load-next   | (N--)        | Close the current block and load block N next |
+| edit        | (N--)        | N: Block number to edit |
 | system      | (S--)        | PC ONLY: S: String to send to `system()` |
 | bye         | (--)         | PC ONLY: Exit C4A |
 

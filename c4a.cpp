@@ -106,20 +106,22 @@ char wd[32], *toIn, *inStk[FSTK_SZ+1];
 
 #ifndef FILE_NONE
 #define PRIMS_FILE \
-	X(FLOPEN,  "fopen",     0, t=pop(); n=pop(); push(fileOpen((char*)n, (char*)t)); ) \
-	X(FLCLOSE, "fclose",    0, t=pop(); fileClose(t); ) \
-	X(FLDEL,   "fdelete",   0, t=pop(); fileDelete((char*)t); ) \
-	X(FLREAD,  "fread",     0, t=pop(); n=pop(); TOS = fileRead((char*)TOS, (int)n, t); ) \
-	X(FLWRITE, "fwrite",    0, t=pop(); n=pop(); TOS = fileWrite((char*)TOS, (int)n, t); ) \
-	X(FSEEK,   "fseek",     0, t=pop(); TOS = fileSeek(TOS, t); ) \
-	X(LOADED,  "loaded?",   0, t=pop(); pop(); if (t) { toIn = inPop(); } ) \
-	X(LOAD,    "load",      0, t=pop(); blockLoad((int)t); ) \
-	X(NXTBLK,  "load-next", 0, t=pop(); blockLoadNext((int)t); ) \
-	X(BCACHE,  "blocks",    0, dumpCache(); ) \
-	X(BADDR, "block-addr",  0, t=pop(); push((cell)blockAddr(t)); ) \
-	X(FLUSH,   "flush",     0, flushBlocks(pop()); ) \
-	X(FLBLK, "flush-block", 0, t=pop(); n=pop(); flushBlock(n, 0, t); ) \
-	X(EDIT,    "edit",      0, t=pop(); editBlock(t); )
+	X(FLOPEN,  "fopen",       0, t=pop(); n=pop(); push(fileOpen((char*)n, (char*)t)); ) \
+	X(FLCLOSE, "fclose",      0, t=pop(); fileClose(t); ) \
+	X(FLDEL,   "fdelete",     0, t=pop(); fileDelete((char*)t); ) \
+	X(FLREAD,  "fread",       0, t=pop(); n=pop(); TOS = fileRead((char*)TOS, (int)n, t); ) \
+	X(FLWRITE, "fwrite",      0, t=pop(); n=pop(); TOS = fileWrite((char*)TOS, (int)n, t); ) \
+	X(FSEEK,   "fseek",       0, t=pop(); TOS = fileSeek(t, TOS); ) \
+	X(FPOS ,   "fpos",        0, TOS = filePos(TOS); ) \
+	X(FSIZE,   "fsize",       0, TOS = fileSize(TOS); ) \
+	X(LOADED,  "loaded?",     0, t=pop(); pop(); if (t) { toIn = inPop(); } ) \
+	X(LOAD,    "load",        0, t=pop(); blockLoad((int)t); ) \
+	X(NXTBLK,  "load-next",   0, t=pop(); blockLoadNext((int)t); ) \
+	X(BCACHE,  "blocks",      0, dumpCache(); ) \
+	X(BADDR,   "block-addr",  0, t=pop(); push((cell)blockAddr(t)); ) \
+	X(FLUSH,   "flush",       0, flushBlocks(pop()); ) \
+	X(FLBLK,   "flush-block", 0, t=pop(); n=pop(); flushBlock(n, 0, t); ) \
+	X(EDIT,    "edit",        0, t=pop(); editBlock(t); )
 #else
     #define PRIMS_FILE
 #endif // FILE_NONE
