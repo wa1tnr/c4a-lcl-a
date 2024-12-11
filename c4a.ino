@@ -74,7 +74,8 @@ void loop() {
   }
 
   if (c==9) { c = 32; }
-  if (c==13) {
+  /* if (c==13) { */
+  if (c==EOL_LOCAL) {
       *(in) = 0;
       emit(32); outer(tib);
       ok();

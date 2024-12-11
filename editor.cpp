@@ -230,7 +230,7 @@ static void replace1() {
 }
 
 static int doInsertReplace(char c) {
-    if (c==13) {
+    if (c==EOL_LOCAL) {
         mv(1, -NUM_COLS);
         if (edMode == INSERT) { insertLine(line); }
         return 1;
@@ -255,7 +255,7 @@ static int edReadLine(char *buf, int sz) {
     CursorOn();
     while (len<(sz-1)) {
         char c = key();
-        if (c == 13) { break; }
+        if (c == EOL_LOCAL) { break; }
         if (c ==  3) { len=0; break; }
         if (c == 27) { len=0; break; }
         if (((c==127) || (c==8)) && (0<len)) { --len; zType("\x08 \x08"); }
@@ -329,7 +329,7 @@ static void toBlock() {
         fileClose(fh);
         for (int i=0; i<n; i++ ) {
             char ch = x[i];
-            if (ch==13) { continue; }
+            if (ch==EOL_LOCAL) { continue; }
             if (ch==9) { ch=32; }
             if (ch==10) {
                 while (c < NUM_COLS) { EDCH(r,c)=32; c++; }
@@ -346,7 +346,7 @@ static void doCTL(int c) {
         mv(0, -1); if (edMode == INSERT) { deleteChar(0); }
         return;
     }
-    if (c == 13) {      // <CR>
+    if (c == EOL_LOCAL) {      // <CR>
         mv(1, -NUM_COLS); if (edMode == INSERT) { insertLine(line); }
         return;
     }

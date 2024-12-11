@@ -3,7 +3,9 @@
 
 #define VERSION   20241204
 #define _SYS_LOAD_
-#define EDITOR
+#define EDITOR (editor.c)
+
+#define EOL_LOCAL 10
 
 #ifdef _MSC_VER
   #define _CRT_SECURE_NO_WARNINGS
@@ -13,6 +15,9 @@
   #define IS_LINUX   1
   #define IS_PC      1
 #endif
+
+/* grover */
+#undef IS_PC      1
 
 #include <stdio.h>
 #include <stdlib.h>
