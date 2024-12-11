@@ -5,7 +5,18 @@
 #define mySerial Serial // Teensy and Pico
 
 #ifdef mySerial
-    void serialInit() { while (!mySerial) ; }
+    void serialInit() {
+        mySerial.begin(9600);
+        while (!mySerial);
+        mySerial.println();
+        mySerial.println();
+        mySerial.print("    c4a local tnr version: ");
+        mySerial.print(__DATE__);
+        mySerial.write(' ');
+        mySerial.println(__TIME__);
+        mySerial.write(' ');
+        mySerial.println("    tannis feldspar delta  __");
+    }
     void emit(char c) { mySerial.print(c); }
     void zType(const char *s) { mySerial.print(s); }
     int qKey() { return mySerial.available(); }
@@ -53,6 +64,7 @@ cell fetch16(cell l) {
 
 char *in, tib[128];
 void setup() {
+  delay(900);
   serialInit();
   c4Init();
   outer(" .\" %nc4 - version \" .version cr");
