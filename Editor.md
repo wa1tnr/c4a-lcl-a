@@ -25,6 +25,7 @@ There are 4 modes in the editor:
 | [ctrl]+j  | Down 1 line |
 | [ctrl]+k  | Up 1 line |
 | [ctrl]+l  | Right 1 char |
+| [ctrl]+q  | Left 8 chars |
 | [ctrl]+s  | Save the block to disk |
 | [ctrl]+x  | Delete the char under the cursor |
 | [ctrl]+z  | Delete the char to the left of the cursor |
@@ -73,6 +74,8 @@ The movement keys are similar to those in VI:
 | O    | Insert an empty line ABOVE the current line and change to INSERT mode |
 | p    | Paste the YANK buffer into a new line BELOW the current line |
 | P    | Paste the YANK buffer into a new line ABOVE the current line |
+| q    | Right 8 chars |
+| Q    | Left 8 chars |
 | r    | Replace the char under the cursor with the next key pressed (if printable) |
 | R    | Change to REPLACE mode |
 | t    | Transfer current block to text file 'block-NNN.fth' |

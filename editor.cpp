@@ -360,6 +360,7 @@ static void doCTL(int c) {
         BCASE 10:   mv(1, 0);               // <ctrl-j>
         BCASE 11:   mv(-1, 0);              // <ctrl-k>
         BCASE 12:   mv(0, 1);               // <ctrl-l>
+        BCASE 17:   mv(0, -8);              // <ctrl-q>
         BCASE 24:   edDelX('.');            // <ctrl-x>
         BCASE 20:   edSvBlk(0);             // <ctrl-s>
         BCASE 26:   edDelX('z');            // <ctrl-z>
@@ -417,6 +418,8 @@ static int processEditorChar(int c) {
         BCASE 'O': mv(0, -NUM_COLS); insertLine(line); insertMode();
         BCASE 'p': mv(1,-NUM_COLS); insertLine(line); putLine(line);
         BCASE 'P': mv(0,-NUM_COLS); insertLine(line); putLine(line);
+        BCASE 'q': mv(0,8);
+        BCASE 'Q': mv(0,-8);
         BCASE 'r': replace1();
         BCASE 'R': replaceMode();
         BCASE 't': toText();
