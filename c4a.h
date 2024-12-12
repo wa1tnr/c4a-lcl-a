@@ -1,7 +1,7 @@
 #ifndef __C4_H__
 #define __C4_H__
 
-#define VERSION   20241204
+#define VERSION   20241212
 #define _SYS_LOAD_
 #define EDITOR
 
