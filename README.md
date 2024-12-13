@@ -1,9 +1,9 @@
 # c4a: a 32-bit Forth system for PCs and Arduino, inspired by ColorForth and Tachyon
 
-## ColorForth's influence on C4A
-- C4A supports control characters in the whitespace that change the state.<br/>
-- C4A has 4 states: INTERPRET, COMPILE, DEFINE, AND COMMENT,<br/>
-- C4A also supports the standard state-change words.<br/>
+## ColorForth's influence on c4a
+- c4a supports control characters in the whitespace that change the state.<br/>
+- c4a has 4 states: INTERPRET, COMPILE, DEFINE, AND COMMENT,<br/>
+- c4a also supports the standard state-change words.<br/>
 
 | Ascii | Word  | State | Description|
 |:--    |:--    |:--    |:-- |
@@ -14,24 +14,24 @@
 |       |  (    |   4   | Comment, save current state |
 |       |  )    |       | End comment, restores saved state |
 
-**NOTE**: In the DEFINE state, C4A changes the state to COMPILE after adding the next word.<br/>
+**NOTE**: In the DEFINE state, c4a changes the state to COMPILE after adding the next word.<br/>
 **NOTE**: Unlike ColorForth, ';' compiles EXIT and then changes the state to INTERPRET.<br/>
 
-## Tachyon's influence on C4A
-- In C4A, a program is a sequence of WORD-CODEs. <br/>
+## Tachyon's influence on c4a
+- In c4a, a program is a sequence of WORD-CODEs. <br/>
 - A WORD-CODE is a 32-bit unsigned number (i.e. - a DWORD). <br/>
 - Primitives are assigned numbers sequentially from 0 to [BYE]. <br/>
 - If a WORD-CODE is less than or equal to [BYE], it is a primitive. <br/>
 - If the top 3 bits are set, it is a 29-bit unsigned literal, 0-$1FFFFFFF. <br/>
 - If it is between [BYE], and $E0000000, it is the code address of a word to execute. <br/>
 
-## CELLs in C4A
-- A **CELL** in C4A is 32-bits, the same size as a **WORD-CODE**.
+## CELLs in c4a
+- A **CELL** in c4a is 32-bits, the same size as a **WORD-CODE**.
 - Since development boards don't support 64-bits, neither does c4a.
 - For PCs, only 32-bit platforms are supported.
 - For 64-bit systems, see c4: https://github.com/CCurl/c4).
 
-## Building C4A
+## Building c4a
  
 ### PCs - Windows and Linux, and probably others
 - Windows: there is a c4a.sln file for Visual Studio
@@ -43,7 +43,7 @@
 
 ### Development boards via the Arduino IDE:
 - I use the Arduino IDE v2.0
-- There is a c3.ino file
+- There is a c4a.ino file
 - File `c4a.h` controls parameters for the target board
 - Edit the section where isBOARD is defined to set the configuration for the board
 - Use `#define FILE_NONE` to disable support for blocks and LittleFS
@@ -55,15 +55,15 @@
 - For the Teensy-4.x:
   - Use `#define FILE_TEENSY` to include support for LittleFS
 
-## C4A memory areas
-C4A provides a single memory area. See 'mem-sz' (MEM_SZ in c4a.h) for its size.
+## c4a memory areas
+c4a provides a single memory area. See 'mem-sz' (MEM_SZ in c4a.h) for its size.
 - It is broken into 3 areas: CODE, VARS, and DICT.
 - The CODE area is an aray of WORD-CODEs starting at the beginning of the memory.
   - `here` is an offset into the CODE area.
   - The size of the CODE area is `code-sz`. See 'code-sz' (CODE_SZ in c4a.h).
   - **NOTE**: Use `wc@` and `wc!` to get and set WORD-CODE values in the code area.
-  - **NOTE**: CODE slots 0-25 (`0 wc@ .. 25 wc@`) are reserved for C4A system values.
-  - **NOTE**: CODE slots 26-[BYE] (`26 wc@` .. `[BYE] wc@`) are unused by C4A.
+  - **NOTE**: CODE slots 0-25 (`0 wc@ .. 25 wc@`) are reserved for c4a system values.
+  - **NOTE**: CODE slots 26-[BYE] (`26 wc@` .. `[BYE] wc@`) are unused by c4a.
   - **NOTE**: So c4a provides space for about 75 'free' variables.
   - **NOTE**: These are free for the user/application to use as desired.
 - The VARS area is defined to begin at address `code-sz wc-sz * memory +`.
@@ -74,8 +74,8 @@ C4A provides a single memory area. See 'mem-sz' (MEM_SZ in c4a.h) for its size.
 
 | WORD    | STACK | DESCRIPTION |
 |:--      |:--    |:-- |
-| memory  | (--A) | A: starting address of the C4A memory |
-| mem-sz  | (--N) | N: size in BYTEs of the C4A memory |
+| memory  | (--A) | A: starting address of the c4a memory |
+| mem-sz  | (--N) | N: size in BYTEs of the c4a memory |
 | code-sz | (--N) | N: number of in WORD-CODE slots in the code area |
 | dstk-sz | (--N) | N: size in CELLs of the DATA and RETURN stacks |
 | tstk-sz | (--N) | N: size in CELLs of the A and T stacks |
@@ -91,11 +91,11 @@ C4A provides a single memory area. See 'mem-sz' (MEM_SZ in c4a.h) for its size.
 | base    | (--N) | N: CODE slot for the BASE variable |
 | state   | (--N) | N: CODE slot for the STATE variable |
 
-## C4A Strings
-Strings in C4A are NULL-terminated with no count byte.<br/>
+## c4a Strings
+Strings in c4a are NULL-terminated with no count byte.<br/>
 
 ## Format specifiers in `ftype` and `."`
-Similar to the printf() function in C, C4A supports formatted output using '%'. <br/>
+Similar to the printf() function in C, c4a supports formatted output using '%'. <br/>
 For example `: ascii dup dup dup ." char %c, decimal #%d, binary: %%%b, hex: $%x%n" ;`.
 
 | Format | Stack | Description |
@@ -113,8 +113,8 @@ For example `: ascii dup dup dup ." char %c, decimal #%d, binary: %%%b, hex: $%x
 | %[x]   | (--)  | EMIT [x]. |
 
 ## The A stack
-C4A includes an A stack. <br/>
-This is somewhat similar to MachineForth's operations for 'a', but in C4A, it is a stack.<br/>
+c4a includes an A stack. <br/>
+This is somewhat similar to MachineForth's operations for 'a', but in c4a, it is a stack.<br/>
 The size of the A stack is configurable (see `tstk-sz`).<br/>
 
 | WORD  | STACK | DESCRIPTION |
@@ -128,7 +128,7 @@ The size of the A stack is configurable (see `tstk-sz`).<br/>
 | adrop | (--)  | Drop A-TOS |
 
 ## The T Stack
-C4A includes a T stack, with tge same operations as the A stack. <br/>
+c4a includes a T stack, with the same operations as the A stack. <br/>
 Note that there are also additional words for the return stack. <br/>
 
 | WORD  | STACK | DESCRIPTION |
@@ -141,7 +141,7 @@ Note that there are also additional words for the return stack. <br/>
 | `t>`  | (--N) | Pop N from the T stack. |
 | tdrop | (--)  | Drop T-TOS |
 
-## C4A WORD-CODE primitives
+## c4a WORD-CODE primitives
 Stack effect notation conventions:
 
 | TERM     | DESCRIPTION |
@@ -226,7 +226,7 @@ The primitives:
 | next-wd     | (--L)        | L: length of the next word from the input stream |
 | immediate   | (--)         | Mark the last created word as IMMEDIATE |
 | inline      | (--)         | Mark the last created word as INLINE |
-| outer       | (S--)        | Send string S to the C4A outer interpreter |
+| outer       | (S--)        | Send string S to the c4a outer interpreter |
 | addword     | (--)         | Add the next word to the dictionary |
 | timer       | (--N)        | N: Current time |
 | see X       | (--)         | Output the definition of word X |
@@ -258,8 +258,8 @@ The primitives:
 | flush-block | (N F--)      | N: Block number, F: True => clear cache entry |
 | edit        | (N--)        | N: Block number to edit |
 | system      | (S--)        | PC ONLY: S: String to send to `system()` |
-| bye         | (--)         | PC ONLY: Exit C4A |
+| bye         | (--)         | PC ONLY: Exit c4a |
 
-## C4A default words
+## c4a default words
 Default words are defined in function `sys_load()` in file sys-load.cpp.<br/>
 For details, or to add or change the default words, modify that function.

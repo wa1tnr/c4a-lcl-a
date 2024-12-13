@@ -66,6 +66,7 @@ The movement keys are similar to those in VI:
 | D    | Delete to the end of the line (same as 'd$') |
 | g    | Goto the top-left of the screen |
 | G    | Goto the bottom-left of the screen |
+| H    | Toggle between current block and help block (block+1) |
 | i    | Insert: change to INSERT mode |
 | I    | Insert: goto the beginning of the line and change to INSERT mode (same as '_i') |
 | J    | Join the current and next lines together |
