@@ -1,4 +1,4 @@
-block #005 - screen
+block #005 - screen words
 find cls loaded?
 cur-on(--)." %e[?25h" ;       cur-off(--)." %e[?25l" ;
 cur-block(--)." %e[2 q" ;     cur-bar(--)." %e[5 q" ;
