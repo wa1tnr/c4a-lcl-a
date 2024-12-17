@@ -165,8 +165,7 @@ void comma(cell x) { code[here++] = (wc_t)x; }
 void commaCell(cell n) { store32((cell)&code[here], n); here += (CELL_SZ / WC_SZ); }
 int  changeState(int x) { state = x; return x; }
 void ok() { if (state==0) { state=INTERP; } zType((state==INTERP) ? " ok\r\n" : "... "); }
-wc_t getWCat(cell addr) { return code[addr]; }
-void setWCat(cell addr, wc_t val) { code[addr] = val; }
+void storeWC(cell addr, wc_t val) { code[addr] = val; }
 
 int strEqI(const char *s, const char *d) {
 	while (lower(*s) == lower(*d)) { if (*s == 0) { return 1; } s++; d++; }

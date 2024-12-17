@@ -80,7 +80,9 @@ The movement keys are similar to those in VI:
 | r    | Replace the char under the cursor with the next key pressed (if printable) |
 | R    | Change to REPLACE mode |
 | t    | Transfer current block to text file 'block-NNN.fth' |
-| T    | Transfer text file 'block-NNN.fth' to current block  |
+| T    | Transfer text file 'block-NNN.fth' to current block |
+| w    | Move right to the beginning of the next word |
+| W    | Move left to the beginning of the previous word |
 | x    | Delete the char under the cursor to the end of the line |
 | X    | Delete the char under the cursor to the end of the block |
 | Y    | Copy the current line into the YANK buffer |

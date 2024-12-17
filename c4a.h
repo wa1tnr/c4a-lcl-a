@@ -1,7 +1,7 @@
 #ifndef __C4_H__
 #define __C4_H__
 
-#define VERSION   20241212
+#define VERSION   20241216
 #define _SYS_LOAD_
 #define EDITOR
 
@@ -21,14 +21,14 @@
 #include <time.h>
 
 #ifdef IS_PC
-  #define MEM_SZ        2*1024*1024
+  #define MEM_SZ        4*1024*1024
   #define STK_SZ            64 // Data stack
   #define RSTK_SZ           64 // Return stack
   #define LSTK_SZ           45 // 15 nested loops (3 entries per loop)
   #define TSTK_SZ           64 // 'A' and 'T' stacks
   #define FSTK_SZ           16 // Files stack
   #define NAME_LEN          17 // To make dict-entry size 24 (17+1+1+1+4)
-  #define CODE_SLOTS   32*1024 // 32*1024*4 = 128k bytes
+  #define CODE_SLOTS   48*1024 // 48*1024*4 = 192k bytes
   #define BLOCK_CACHE_SZ    32 // Each block is 1024 bytes
   #define BLOCK_MAX       1023 // Maximim block
 #define FILE_PC
@@ -87,8 +87,7 @@ extern int  changeState(int x);
 extern void inner(wc_t start);
 extern void outer(const char *src);
 extern void outerF(const char *fmt, ...);
-extern wc_t getWCat(cell addr);
-extern void setWCat(cell addr, wc_t val);
+extern void storeWC(cell addr, wc_t val);
 extern void ok();
 
 // c4.cpp needs these to be defined

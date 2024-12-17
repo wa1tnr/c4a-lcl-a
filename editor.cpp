@@ -34,7 +34,6 @@ static void CursorBlock() { zType("\x1B[2 q"); }
 static void CursorOn() { zType("\x1B[?25h"); }
 static void CursorOff() { zType("\x1B[?25l"); }
 static void showCursor() { GotoXY(off+2, line+2); CursorOn(); CursorBlock(); }
-static void Color(int fg, int bg) { zTypeF("\x1B[%d;%dm", (30+fg), bg?bg:40); }
 static void FG(int fg) { zTypeF("\x1B[38;5;%dm", fg); }
 static void toFooter() { GotoXY(1, NUM_LINES+3); }
 static void toCmd() { GotoXY(1, NUM_LINES+4); }
@@ -48,7 +47,7 @@ static void Red() { FG(203); }
 static void Yellow() { FG(226); }
 static void White() { FG(255); }
 
-static void setBlock(int blk) { block=MAX(MIN(blk,BLOCK_MAX),0); setWCat(BLKA, block); }
+static void setBlock(int blk) { block=MAX(MIN(blk,BLOCK_MAX),0); storeWC(BLKA, block); }
 
 static int vtKey() {
     int y = key();
@@ -97,6 +96,16 @@ static void mv(int r, int c) {
     if (NUM_LINES <= line) { line = MAX_LINE; }
     if (off < 0) { off=0; }
     if (NUM_COLS <= off) { off = MAX_COL;}
+}
+
+static void moveWord(int isRight) {
+    if (isRight) {
+        while ((off < MAX_COL) & (EDCH(line,off) > 32)) { ++off; }
+        while ((off < MAX_COL) & (EDCH(line,off) < 33)) { ++off; }
+    } else {
+        while ((0 < off) & (EDCH(line,off-1) < 33)) { --off; }
+        while ((0 < off) & (EDCH(line,off-1) > 32)) { --off; }
+    }
 }
 
 static void showState(char ch) {
@@ -222,10 +231,8 @@ static void replaceChar(char c, int force, int mov) {
 }
 
 static void replace1() {
-    FG(117); zType("?\x08");
-    toCmd(); Red(); zType("-char?-"); CursorOn();
+    FG(117); zType("?\x08"); CursorOn();
     int ch = key(); CursorOff();
-    toCmd(); ClearEOL();
     replaceChar(ch, 0, 1);
     isShow = 1;
 }
@@ -419,6 +426,8 @@ static int processEditorChar(int c) {
         BCASE 'R': replaceMode();
         BCASE 't': toText();
         BCASE 'T': toBlock();
+        BCASE 'w': moveWord(1);
+        BCASE 'W': moveWord(0);
         BCASE 'x': deleteChar(0);
         BCASE 'X': deleteChar(1);
         BCASE 'Y': yankLine(line);
