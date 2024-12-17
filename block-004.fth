@@ -1,8 +1,8 @@
-block #004 - some simple benchmarks
+block #004 - doc for string words
 
-mil1000 dup * * ;
-bmtimer swap for next timer swap - . ;
-bb1000 mil bm ;
+
+
+
 
 
 

@@ -70,13 +70,13 @@ void sys_load() {
     outer(": t+  t@+ drop ;  : t-  t@- drop ;");
 
     outer("100 var #buf");
-    outer(": <#   ( n1--n2 )  #buf 99 + >t 0 t@ c! dup 0 < >a abs ;");
-    outer(": #c   ( c-- )     t- t@ c! ;");
-    outer(": #.   ( -- )      '.' #c ;");
-    outer(": #n   ( n-- )     dup 9 > if 7 + then '0' + #c ;");
-    outer(": #    ( n1--n2 )  base@ /mod swap #n ;");
-    outer(": #s   ( n-- )     begin # -while ;");
-    outer(": #>   ( --str )   drop a> if '-' #c then t> ;");
+    outer(": <# ( n1--n2 ) #buf 99 + >t 0 !t- dup 0 < >a abs ;");
+    outer(": #c ( c-- )    !t- ; inline");
+    outer(": #. ( -- )     '.' #c ;");
+    outer(": #n ( n-- )    dup 9 > if 7 + then '0' + #c ;");
+    outer(": #  ( n1--n2 ) base@ /mod swap #n ;");
+    outer(": #s ( n-- )    begin # -while ;");
+    outer(": #> ( --str )  drop a> if '-' #c then t> 1+ ;");
     outer(": (.) <# #s #> ztype ;");
     outer(": . (.) 32 emit ;");
 

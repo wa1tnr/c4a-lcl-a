@@ -27,7 +27,6 @@ enum { Up=7240, Dn=7248, Rt=7245, Lt=7243, Home=7239, PgUp=7241, PgDn=7249,
 static cell line, off, edMode, isDirty, isShow, block;
 static char edBuf[BLOCK_SZ], yanked[NUM_COLS+1], *curLine;
 
-static void setBlock(wc_t blk) { setWCat(BLKA, blk); block=blk; }
 static void GotoXY(int x, int y) { zTypeF("\x1B[%d;%dH", y, x); }
 static void CLS() { zType("\x1B[2J"); GotoXY(1, 1); }
 static void ClearEOL() { zType("\x1B[K"); }
@@ -35,7 +34,6 @@ static void CursorBlock() { zType("\x1B[2 q"); }
 static void CursorOn() { zType("\x1B[?25h"); }
 static void CursorOff() { zType("\x1B[?25l"); }
 static void showCursor() { GotoXY(off+2, line+2); CursorOn(); CursorBlock(); }
-static void Color(int fg, int bg) { zTypeF("\x1B[%d;%dm", (30+fg), bg?bg:40); }
 static void FG(int fg) { zTypeF("\x1B[38;5;%dm", fg); }
 static void toFooter() { GotoXY(1, NUM_LINES+3); }
 static void toCmd() { GotoXY(1, NUM_LINES+4); }
@@ -48,6 +46,8 @@ static void Green() { FG(40); }
 static void Red() { FG(203); }
 static void Yellow() { FG(226); }
 static void White() { FG(255); }
+
+static void setBlock(int blk) { block=MAX(MIN(blk,BLOCK_MAX),0); storeWC(BLKA, block); }
 
 static int vtKey() {
     int y = key();
@@ -96,6 +96,16 @@ static void mv(int r, int c) {
     if (NUM_LINES <= line) { line = MAX_LINE; }
     if (off < 0) { off=0; }
     if (NUM_COLS <= off) { off = MAX_COL;}
+}
+
+static void moveWord(int isRight) {
+    if (isRight) {
+        while ((off < MAX_COL) & (EDCH(line,off) > 32)) { ++off; }
+        while ((off < MAX_COL) & (EDCH(line,off) < 33)) { ++off; }
+    } else {
+        while ((0 < off) & (EDCH(line,off-1) < 33)) { --off; }
+        while ((0 < off) & (EDCH(line,off-1) > 32)) { --off; }
+    }
 }
 
 static void showState(char ch) {
@@ -221,10 +231,8 @@ static void replaceChar(char c, int force, int mov) {
 }
 
 static void replace1() {
-    FG(117); zType("?\x08");
-    toCmd(); Red(); zType("-char?-"); CursorOn();
+    FG(117); zType("?\x08"); CursorOn();
     int ch = key(); CursorOff();
-    toCmd(); ClearEOL();
     replaceChar(ch, 0, 1);
     isShow = 1;
 }
@@ -283,16 +291,9 @@ static void edCommand() {
     }
 }
 
-static void PageUp() {
-    if (0 < block) {
-        edSvBlk(0); setBlock(block-1);
+static void gotoBlock(int blk) {
+        edSvBlk(0); setBlock(blk);
         edRdBlk(); line = off = 0;
-    }
-}
-
-static void PageDn() {
-    edSvBlk(0); setBlock(block+1);
-    edRdBlk(); line = off = 0;
 }
 
 static void toText() {
@@ -371,10 +372,10 @@ static void doCTL(int c) {
         BCASE Dn:   mv(1, 0);               // Down
         BCASE Home: mv(0, -NUM_COLS);       // Home
         BCASE End:  gotoEOL();              // End
-        BCASE PgUp: PageUp();               // PgUp
-        BCASE PgDn: PageDn();               // PgDn
-        BCASE Del: edDelX('.');            // Delete
-        BCASE Ins: toggleInsert();         // Insert
+        BCASE PgUp: gotoBlock(block-1);     // PgUp
+        BCASE PgDn: gotoBlock(block+1);     // PgDn
+        BCASE Del:  edDelX('.');            // Delete
+        BCASE Ins:  toggleInsert();         // Insert
         BCASE CHome: mv(-NUM_LINES, -NUM_COLS);  // <ctrl>-Home
     }
 }
@@ -393,8 +394,8 @@ static int processEditorChar(int c) {
         BCASE '2': replaceChar(2,1,0); // DEFINE
         BCASE '3': replaceChar(3,1,0); // INTERP
         BCASE '4': replaceChar(4,1,0); // COMMENT
-        BCASE '+': edSvBlk(0); PageDn();
-        BCASE '-': edSvBlk(0); PageUp();
+        BCASE '+': gotoBlock(block+1); // Next block
+        BCASE '-': gotoBlock(block-1); // Prev block
         BCASE ':': edCommand();
         BCASE 'a': mv(0, 1); insertMode();
         BCASE 'A': gotoEOL(); insertMode();
@@ -407,6 +408,7 @@ static int processEditorChar(int c) {
         BCASE 'g': mv(-NUM_LINES,-NUM_COLS);
         BCASE 'G': mv(NUM_LINES,-NUM_COLS);
         BCASE 'h': mv(0,-1);
+        BCASE 'H': gotoBlock((block & 0x01) ? block+1 : block-1);
         BCASE 'i': insertMode();
         BCASE 'I': mv(0, -NUM_COLS); insertMode();
         BCASE 'j': mv(1, 0);
@@ -424,6 +426,8 @@ static int processEditorChar(int c) {
         BCASE 'R': replaceMode();
         BCASE 't': toText();
         BCASE 'T': toBlock();
+        BCASE 'w': moveWord(1);
+        BCASE 'W': moveWord(0);
         BCASE 'x': deleteChar(0);
         BCASE 'X': deleteChar(1);
         BCASE 'Y': yankLine(line);
