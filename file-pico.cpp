@@ -12,7 +12,7 @@
 
 #define NFILES 16
 cell inputFp, outputFp;
-static char fn[32];
+// static char fn[32];
 static File files[NFILES+1];
 
 static int isValidFile(cell fh) { return btwi(fh, 1, NFILES) ? 1 : 0; }
