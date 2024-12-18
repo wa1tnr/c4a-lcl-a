@@ -39,6 +39,7 @@
 #define FILE_PC
 #else
   #include <Arduino.h>
+  #include "tnrMods-a.h"
   #define MEM_SZ      400*1024 // These are for a RPi PICO 2 (2350)
   #define STK_SZ            64 // Data stack
   #define RSTK_SZ           64 // Return stack
