@@ -35,7 +35,7 @@ static void CursorBlock() { zType("\x1B[2 q"); }
 static void CursorOn() { zType("\x1B[?25h"); }
 static void CursorOff() { zType("\x1B[?25l"); }
 static void showCursor() { GotoXY(off+2, line+2); CursorOn(); CursorBlock(); }
-static void Color(int fg, int bg) { zTypeF("\x1B[%d;%dm", (30+fg), bg?bg:40); }
+// static void Color(int fg, int bg) { zTypeF("\x1B[%d;%dm", (30+fg), bg?bg:40); }
 static void FG(int fg) { zTypeF("\x1B[38;5;%dm", fg); }
 static void toFooter() { GotoXY(1, NUM_LINES+3); }
 static void toCmd() { GotoXY(1, NUM_LINES+4); }
@@ -44,10 +44,10 @@ static void insertMode()  { edMode=INSERT;  }
 static void replaceMode() { edMode=REPLACE; }
 static void toggleInsert() { (edMode==INSERT) ? normalMode() : insertMode(); }
 static int winKey() { return (224 << 5) ^ key(); }
-static void Green() { FG(40); }
+// static void Green() { FG(40); }
 static void Red() { FG(203); }
-static void Yellow() { FG(226); }
-static void White() { FG(255); }
+// static void Yellow() { FG(226); }
+// static void White() { FG(255); }
 
 static int vtKey() {
     int y = key();
@@ -297,7 +297,7 @@ static void PageDn() {
 
 static void toText() {
     char x[NUM_COLS+1];
-    sprintf(x,"block-%03d.fth",block);
+    sprintf(x,"block-%03d.fth",(int) block);
     cell fh = fileOpen(x, "wb");
     if (fh) {
         outputFp = fh;
@@ -320,7 +320,7 @@ static void toText() {
 
 static void toBlock() {
     char x[BLOCK_SZ+1];
-    sprintf(x,"block-%03d.fth",block);
+    sprintf(x,"block-%03d.fth",(int) block);
     cell fh = fileOpen(x, "rb");
     if (fh) {
         for (int i=0; i<BLOCK_SZ; i++ ) { edBuf[i]=32; }
