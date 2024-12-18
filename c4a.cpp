@@ -139,6 +139,7 @@ char wd[32], *toIn, *inStk[FSTK_SZ+1];
 	X(PWRITED, "dpin!",      0, t=pop(); n=pop(); digitalWrite(t, n); ) \
 	X(PREADA,  "apin@",      0, TOS = analogRead(TOS); ) \
 	X(PWRITEA, "apin!",      0, t=pop(); n=pop(); analogWrite(t, n); ) \
+	X(GOJIRA,  "gojira!",    0, gojiraBoot(); ) \
 	X(BYE,     "bye",        0, ttyMode(0); )
 #endif // IS_PC
 
