@@ -244,10 +244,11 @@ DE_T *findWord(const char *w) {
 }
 
 int findXT(int xt) {
+        Serial.println(" DEBUG: Line 247: c4a.cpp: cast of dp->xt to (int) NON_STANDARD");
 	int cw = last;
 	while (cw < MEM_SZ) {
 		DE_T *dp = (DE_T*)&memory[cw];
-		if (dp->xt == xt) { return cw; }
+		if ((int) dp->xt == xt) { return cw; }
 		cw += sizeof(DE_T);
 	}
 	return 0;
