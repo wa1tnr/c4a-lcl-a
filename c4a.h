@@ -17,7 +17,7 @@
 #endif
 
 /* grover */
-#undef IS_PC      1
+#undef IS_PC
 
 #include <stdio.h>
 #include <stdlib.h>
